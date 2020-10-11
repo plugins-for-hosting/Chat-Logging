@@ -48,12 +48,12 @@ public void OnPluginStart()
 		AddCommandListener(Say_Callback, g_sSay[i]);
 	}
 
-	if(!SQL_CheckConfig(g_sTable))
+	if(!SQL_CheckConfig("chatlog"))
 	{
-		SetFailState("[CHAT LOG] Database failure: Could not find Database conf \"%s\"", g_sTable);
+		SetFailState("[CHAT LOG] Database failure: Could not find Database conf \"%s\"", "chatlog");
 		return;
 	}
-	Database.Connect(SQL_OnConnect, g_sTable);
+	Database.Connect(SQL_OnConnect, "chatlog");
 }
 
 void RegConVar(ConVar &hCvar, const char[] sCvar, const char[] sDefValue, const char[] sDesc, ConVarChanged callback, int index)
