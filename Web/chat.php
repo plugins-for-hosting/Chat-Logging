@@ -12,29 +12,29 @@
 
 header('Content-Type: text/html; charset=utf-8');
 
-# Данные для подключения к базе данных
-$dbinfo_hostname = "";     // Хост
-$dbinfo_username = ""; // Имя пользователя
-$dbinfo_password = "";      // Пароль
-$dbinfo_dbtable = "";  // Название базы данных
-$dbinfo_tablename = "chatlog"; // Название таблицы (квар sm_chat_log_table)
+# Information for connecting to database
+$dbinfo_hostname = "";     // Host
+$dbinfo_username = ""; // Username
+$dbinfo_password = "";      // Password
+$dbinfo_dbtable = "";  // Database Name
+$dbinfo_tablename = "chatlog"; // Table name (cvar sm_chat_log_table)
 
 $dbinfo_link = "mysql:host=" . $dbinfo_hostname . ";dbname=" . $dbinfo_dbtable . "";
 
-# Подключение к базе данных
+# Database connection
 try 
 { 
 	$db = new PDO($dbinfo_link, $dbinfo_username, $dbinfo_password);
 	$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	$db->exec("SET NAMES UTF8");
+	$db->exec("SET NAMES 'utf8mb4'");
 }
 
 catch(PDOException $e) 
 {
-    print "Подключение не удалось. Отсутствует таблица либо неверно указаны данные для подключения.";
+    print "Connection failed. The table is missing or the connection data is incorrect.";
 }
 
-# Кол-во отображаемых последних сообщений. Default: 25
+# Number of recent messages displayed. Default: 25
 if (isset($_GET['num']))
 {
 	$limit = (int)$_GET['num'];
@@ -54,7 +54,7 @@ $count = count($data);
 
 ?>
 
-<html lang="ru">
+<html lang="en">
 <head>
 <title>Chat Logging</title>
 <link href="template/css/bootstrap.min.css" rel="stylesheet">
@@ -65,12 +65,12 @@ $count = count($data);
 		<nav class="navbar navbar-default" role="navigation">
 			<div class="navbar-header">
 				<a class="navbar-brand">Chat Logging</a>
-				<p class="navbar-text pull-right">Лог записей чата</p>
+				<p class="navbar-text pull-right">Chat Log</p>
 			</div>
 		</nav>
 		<div class="row">
 			<div class="col-md-12">
-				Показывать записей:
+				Show Records:
 					<div class="btn-group btn-group-sm">
 						<a class="btn btn-default" href="?num=25">25</a>
 						<a class="btn btn-default" href="?num=50">50</a>
@@ -81,12 +81,12 @@ $count = count($data);
 					<div class="panel-body">
 					<?php
 					
-					# Если чат пуст
-					if ($count <= 0) print "<p class=\"text-center\">Чат пуст :(</p>";
+					# If the chat log is empty
+					if ($count <= 0) print "<p class=\"text-center\">Chat log is empty :(</p>";
 
 					foreach ($data as $msg_info)
 					{
-						# Цвета команд (bootstrap css class text-*)
+						# Team colors (bootstrap css class text-*)
 						$ingame = true;
 						switch((int)$msg_info['team'])
 						{
@@ -105,19 +105,19 @@ $count = count($data);
 								break;
 						}
 
-						# Командый чат - true/false
+						# Team chat - true/false
 						$say_team = (bool)($msg_info['type'] == "say_team");
  					
-						# Время написания сообщения
-						print "<strong><span class=\"text-info\">[" . date("d-m H:i:s", $msg_info['timestamp']) . "]</span> ";
+						# time that message wrote
+						print "<strong><span class=\"text-info\">[" . date("Y-m-d H:i:s", $msg_info['timestamp']) . "]</span> ";
 						
-						# В наблюдателях/в команде - true/false
+						# in spectator/in team - true/false
 						$ingame = (bool)($msg_info['team'] == 0);
 						
-						# Игрок жив/мертв
+						# Player is alive / dead
 						if ($msg_info['team'] > 1 && !$msg_info['alive']) print "<span style=\"color: #ffb000;\">*DEAD*</span> ";
 						
-						# Приставки в зависимости от типа сообщения (basechat)
+						# Prefixes depending on the type of message (basechat)
 						if ($msg_info['type'] == "sm_hsay") print "<span class=\"text-success\">[HSAY]</span>";
 						if ($msg_info['type'] == "sm_msay") print "<span class=\"text-success\">[MSAY]</span>";
 						if ($msg_info['type'] == "sm_psay") print "<span class=\"text-success\">[PRIVATE]</span>";
@@ -125,38 +125,54 @@ $count = count($data);
 						if ($msg_info['type'] == "sm_say") print "<span class=\"text-success\">(ALL)</span>";
 						if ($msg_info['type'] == "sm_csay") print "<span class=\"text-success\">[CSAY]</span>";
 						
-						# Цвет ника
+						# Nickname color
 						print "<span class=\"text-" .$textcolor. "\">";
 						
-						# Командый чат - приставка
+						# Team chat - prefix
 						if($say_team) 
 						{
+							#Counter Strike
+							/*
 							switch((int)$msg_info['team'])
 							{
 								case 2:
-									$team = "(Террорист)";
+									$team = "(TERRORISTS)";
 									break;
 								case 3:
-									$team = "(Спецназовец)";
+									$team = "(COUNTER-TERRORISTS)";
 									break;
 								default:
-									$team = "(НАБЛЮДАТЕЛЬ)";
+									$team = "(SPECTATOR)";
+									break;
+							}
+							*/
+							# TF2
+							switch((int)$msg_info['team'])
+							{
+								case 2:
+									$team = "(RED)";
+									break;
+								case 3:
+									$team = "(BLUE)";
+									break;
+								default:
+									$team = "(SPECTATOR)";
 									break;
 							}
 
 							print $team;
 						}
 						
-						# Ник игрока, который написал сообщение
+						# Nickname of the player who wrote the message
 						print " " . $msg_info['name'] . ":</span> ";
 						
-						# Текст сообщения (если psay - скрываем)
-						if ($msg_info['type'] == "sm_psay") print "<span style=\"color: #ffb000;\">*ПРИВАТНОЕ СООБЩЕНИЕ*</span></strong><br>";
+						# Message text (if psay - hide)
+						if ($msg_info['type'] == "sm_psay") print "<span style=\"color: #ffb000;\">*PRIVATE MESSAGE*</span></strong><br>";
 						else print "<span style=\"color: #ffb000;\">" . $msg_info['message'] . "</span></strong><br>";
 
 					}
 
-					# Закрываем соединие с базой данных
+					# Closing the database connection
 					$db = null;
 					?>
 					</div>
