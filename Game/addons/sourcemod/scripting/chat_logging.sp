@@ -12,7 +12,7 @@ ConVar g_hServerID;
 ConVar g_hTable;
 
 static const char g_sSay[][] = {"say", "say_team", "sm_say", "sm_chat", "sm_csay", "sm_tsay", "sm_msay", "sm_hsay", "sm_psay"};
-char g_sTable[] = "chatlog";
+char g_sTable[256] = "chatlog";
 
 public Plugin myinfo = 
 {
@@ -50,7 +50,7 @@ public void OnPluginStart()
 
 	if(!SQL_CheckConfig("chatlog"))
 	{
-		SetFailState("[CHAT LOG] Database failure: Could not find Database conf \"%s\"", "chatlog");
+		SetFailState("[CHAT LOG] Database failure: Could not find Database conf \"chatlog\"");
 		return;
 	}
 	Database.Connect(SQL_OnConnect, "chatlog");

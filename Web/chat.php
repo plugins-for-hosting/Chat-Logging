@@ -12,6 +12,10 @@
 
 header('Content-Type: text/html; charset=utf-8');
 
+# Game info
+
+$gameinfo = "TF2"; // CSS or TF2
+
 # Information for connecting to database
 $dbinfo_hostname = "";     // Host
 $dbinfo_username = ""; // Username
@@ -77,7 +81,7 @@ $count = count($data);
 						<a class="btn btn-default" href="?num=100">100</a>
 					</div><br />
 				<div class="panel panel-default">
-					<div class="panel-heading">Чат</div>
+					<div class="panel-heading">Chat</div>
 					<div class="panel-body">
 					<?php
 					
@@ -131,32 +135,38 @@ $count = count($data);
 						# Team chat - prefix
 						if($say_team) 
 						{
-							#Counter Strike
-							/*
-							switch((int)$msg_info['team'])
+							switch ($gameinfo)
 							{
-								case 2:
-									$team = "(TERRORISTS)";
+								case "CSS":
+									switch((int)$msg_info['team'])
+									{
+										case 2:
+											$team = "(TERRORISTS)";
+											break;
+										case 3:
+											$team = "(COUNTER-TERRORISTS)";
+											break;
+										default:
+											$team = "(SPECTATOR)";
+											break;
+									}
+									
 									break;
-								case 3:
-									$team = "(COUNTER-TERRORISTS)";
-									break;
-								default:
-									$team = "(SPECTATOR)";
-									break;
-							}
-							*/
-							# TF2
-							switch((int)$msg_info['team'])
-							{
-								case 2:
-									$team = "(RED)";
-									break;
-								case 3:
-									$team = "(BLUE)";
-									break;
-								default:
-									$team = "(SPECTATOR)";
+									
+								case "TF2":
+									switch((int)$msg_info['team'])
+									{
+										case 2:
+											$team = "(RED)";
+											break;
+										case 3:
+											$team = "(BLUE)";
+											break;
+										default:
+											$team = "(SPECTATOR)";
+											break;
+									}
+									
 									break;
 							}
 

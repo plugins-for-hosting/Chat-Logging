@@ -1,49 +1,50 @@
 # Chat Logging
 
-Плагин записывает весь чат сервера (и все админские сообщения) в mysql базу для дальнейшего вывода сообщений на сайте.
+The plugin records the entire server chat (and all admin messages) in the mysql database for further displaying messages on the site.
 
-***Авторы:***
+***Authors:***
 * [R1KO](http://hlmod.ru/members/r1ko.35068/)
 * [Webman](http://hlmod.ru/members/webman.43023/)
 
-[Пример WEB-части](http://m4us.ru/chat.php)
+[Example of the WEB part](http://m4us.ru/chat.php)
 
-***Установка серверной части***
-- Скачиваем последнюю версию.
-- Заливаем `chat_logging.smx` в *`addons/sourcemod/plugins/`*
-- Прописать в *`addons/sourcemod/configs/databases.cfg`*
+***Game Server side installation***
+- Download the latest version.
+- Fill `chat_logging.smx` at *`addons/sourcemod/plugins/`*
+- Register in *`addons/sourcemod/configs/databases.cfg`*
     ```
     "chatlog"
     {
     	"driver"		"mysql"
-    	"host"			"адрес_базы_данных"
-    	"database"		"имя_базы_данных"
-    	"user"			"имя_пользователя"
-    	"pass"			"пароль"
+    	"host"			"db_address"
+    	"database"		"database_name"
+    	"user"			"Username"
+    	"pass"			"password"
     }
     ```
 
-***Настройки***
-- `sm_chat_log_triggers "0"` - Запись в лог чат-триггеров
-- `sm_chat_log_say "1"` - Запись в лог общего чата
-- `sm_chat_log_say_team "1"` - Запись в лог командного чата
-- `sm_chat_log_sm_say "1"` - Запись в лог команды sm_say
-- `sm_chat_log_chat "1"` - Запись в лог команды sm_chat
-- `sm_chat_log_csay "1"` - Запись в лог команды sm_csay
-- `sm_chat_log_tsay "1"` - Запись в лог команды sm_tsay
-- `sm_chat_log_msay "1"` - Запись в лог команды sm_msay
-- `sm_chat_log_hsay "1"` - Запись в лог команды sm_hsay
-- `sm_chat_log_psay "1"` - Запись в лог команды sm_psay
+***Settings(CVAR)***
+- `sm_chat_log_table "chatlog"` - Database table to save chat log
+- `sm_chat_log_triggers "0"` - Logging chat triggers
+- `sm_chat_log_say "1"` - General chat logging
+- `sm_chat_log_say_team "1"` - Writing to the team chat log
+- `sm_chat_log_sm_say "1"` - Logging the sm_say command
+- `sm_chat_log_chat "1"` - Logging the sm_chat command
+- `sm_chat_log_csay "1"` - Logging the sm_csay command
+- `sm_chat_log_tsay "1"` - Logging the sm_tsay command
+- `sm_chat_log_msay "1"` - Logging the sm_msay command
+- `sm_chat_log_hsay "1"` - Logging the sm_hsay command
+- `sm_chat_log_psay "1"` - Logging the sm_psay command
 
-***Установка WEB-части***
-- Скачиваем последнюю версию.
-- Заливаем файлы из папки *`Web`* на WEB-сервер (ftp)
-- Открываем файл *`chat.php`*, находим следующие строки:
+***Web Server side installation***
+- Download the latest version.
+- Upload files from the * `Web` * folder to the WEB server (ftp)
+- Open the file * `chat.php` *, find the following lines:
     ```php
-    # Данные для подключения к базе данных
-    $dbinfo_hostname = "";     // Хост
-    $dbinfo_username = ""; // Имя пользователя
-    $dbinfo_password = "";      // Пароль
-    $dbinfo_dbtable = "";  // Название базы данных
+    # Data to connect to the database
+    $dbinfo_hostname = "";     // Host
+    $dbinfo_username = ""; // Username
+    $dbinfo_password = "";      // Password
+    $dbinfo_dbtable = "";  // Database name
     ```
-- В кавычки вводим соответствующие данные базы данных - те, которые вы указали в файле `databases.cf`g на вашем сервере.
+- In quotes, enter the corresponding database data - those that you specified in the `databases.cfg` file on your server.
