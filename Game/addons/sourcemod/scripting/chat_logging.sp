@@ -24,7 +24,9 @@ public Plugin myinfo =
 public void OnPluginStart()
 {
 	g_hServerID = CreateConVar("sm_chat_log_server_id", "1", "server ID");
+	
 	g_hTable = CreateConVar("sm_chat_log_table", "chatlog", "db Table");
+	g_hTable.AddChangeHook(OnChatLogTableChange);
 	
 	g_hTable.GetString(g_sTable, sizeof(g_sTable));
 
@@ -54,6 +56,11 @@ public void OnPluginStart()
 		return;
 	}
 	Database.Connect(SQL_OnConnect, "chatlog");
+}
+
+public void OnChatLogTableChange(ConVar hCvar, const char[] oldValue, const char[] newValue)
+{
+	hCvar.GetString(g_sTable, sizeof(g_sTable));
 }
 
 void RegConVar(ConVar &hCvar, const char[] sCvar, const char[] sDefValue, const char[] sDesc, ConVarChanged callback, int index)
