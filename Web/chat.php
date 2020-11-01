@@ -14,7 +14,7 @@ header('Content-Type: text/html; charset=utf-8');
 
 # Game info
 
-$gameinfo = "TF2"; // CSS or TF2
+$gameinfo = "TF2"; // CS(Counter Strike) or TF2(Team Fortress 2)
 
 # Information for connecting to database
 $dbinfo_hostname = "";     // Host
@@ -23,7 +23,10 @@ $dbinfo_password = "";      // Password
 $dbinfo_dbtable = "";  // Database Name
 $dbinfo_tablename = "chatlog"; // Table name (cvar sm_chat_log_table)
 
-$dbinfo_link = "mysql:host=" . $dbinfo_hostname . ";dbname=" . $dbinfo_dbtable . "";
+$maxlog_per_page = 36;
+$maxpagecount = 9;
+
+$dbinfo_link = "mysql:host={$dbinfo_hostname};dbname={$dbinfo_dbtable}";
 
 # Database connection
 try 
@@ -38,19 +41,25 @@ catch(PDOException $e)
     print "Connection failed. The table is missing or the connection data is incorrect.";
 }
 
-# Number of recent messages displayed. Default: 25
-if (isset($_GET['num']))
+# Page Number: Default is 1
+if(isset($_GET["page"]) && intval($_GET["page"]) >= 1)
 {
-	$limit = (int)$_GET['num'];
-	if (!$limit)
-	{
-		$limit = 25;
-	}
+	$page = intval($_GET["page"]);
 }
-else $limit = 25;
+else
+{
+	$page = 1;
+}
 
+$result = $db->query("SELECT COUNT(*) AS `count` FROM `{$dbinfo_tablename}`;");
+$data = $result->fetch(PDO::FETCH_ASSOC);
+$result->closeCursor();
+unset($result);
+$rowcount = $data["count"];
 
-$result = $db->query("SELECT * FROM `".$dbinfo_tablename."` ORDER BY `msg_id` DESC LIMIT 0, ".$limit.";");
+$begin = ($page - 1) * $maxlog_per_page;
+
+$result = $db->query("SELECT * FROM `{$dbinfo_tablename}` ORDER BY `msg_id` DESC LIMIT {$begin}, {$maxlog_per_page};");
 $data = $result->fetchAll(PDO::FETCH_ASSOC);
 $result->closeCursor();
 unset($result);
@@ -76,9 +85,32 @@ $count = count($data);
 			<div class="col-md-12">
 				Show Records:
 					<div class="btn-group btn-group-sm">
-						<a class="btn btn-default" href="?num=25">25</a>
-						<a class="btn btn-default" href="?num=50">50</a>
-						<a class="btn btn-default" href="?num=100">100</a>
+						<?php
+						$left = $page - 1;
+						$right = $page + 1;
+						if($left >= 1)
+							echo("						<a class=\"btn btn-default\" href=\"?page={$left}\">◀</a>");
+						
+						if($page < ceil($maxpagecount / 2))
+						{
+							$startfrom = 1;
+						}
+						else
+						{
+							$startfrom = $page - floor(($maxpagecount - 1)/ 2);
+						}
+						
+						$i = $startfrom;
+						
+						while($i < $startfrom + $maxpagecount && $i <= ceil($rowcount / $maxlog_per_page))
+						{
+							echo("						<a class=\"btn btn-default\" href=\"?page={$i}\">{$i}</a>");
+							
+							$i++;
+						}
+						if($right <= ceil($rowcount / $maxlog_per_page))
+							echo("						<a class=\"btn btn-default\" href=\"?page={$right}\">▶</a>");
+						?>
 					</div><br />
 				<div class="panel panel-default">
 					<div class="panel-heading">Chat</div>
