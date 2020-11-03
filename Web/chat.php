@@ -1,5 +1,7 @@
 <?php
 
+require(__DIR__ . "vendor/autoload.php");
+
 /*
 * Chat Logging v 1.0
 *
@@ -17,14 +19,14 @@ header('Content-Type: text/html; charset=utf-8');
 $gameinfo = "TF2"; // CS(Counter Strike) or TF2(Team Fortress 2)
 
 # Information for connecting to database
-$dbinfo_hostname = "";     // Host
-$dbinfo_username = ""; // Username
-$dbinfo_password = "";      // Password
-$dbinfo_dbtable = "";  // Database Name
-$dbinfo_tablename = "chatlog"; // Table name (cvar sm_chat_log_table)
+$dbinfo_hostname = "";			// Host
+$dbinfo_username = "";			// Username
+$dbinfo_password = "";			// Password
+$dbinfo_dbtable = "";			// Database Name
+$dbinfo_tablename = "chatlog";	// Table name (cvar sm_chat_log_table)
 
-$maxlog_per_page = 36;
-$maxpagecount = 9;
+$maxlog_per_page = 36;			// Max chat log per Page
+$maxpagecount = 9;				// Page Index Count
 
 $dbinfo_link = "mysql:host={$dbinfo_hostname};dbname={$dbinfo_dbtable}";
 
