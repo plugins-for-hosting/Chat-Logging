@@ -1,7 +1,7 @@
 {
-"name": "jobggun/chat-logging",
-"require":
-{
-"xpaw/steamid": "*"
-}
+	"name": "jobggun/chat-logging",
+	"require":
+	{
+	"xpaw/steamid": "*"
+	}
 }
