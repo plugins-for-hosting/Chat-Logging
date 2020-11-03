@@ -1,0 +1,7 @@
+{
+"name": "jobggun/chat-logging",
+"require":
+{
+"xpaw/steamid": "*"
+}
+}
