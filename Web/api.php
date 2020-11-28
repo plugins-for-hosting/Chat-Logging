@@ -44,6 +44,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
 
         $stmt = $db->prepare($query);
         $stmt->bindParam(1, $msg_id, PDO::PARAM_INT);
+        $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         send_json(200, "OK", $result);
