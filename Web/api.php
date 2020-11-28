@@ -35,7 +35,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
         $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $query = "SELECT * FROM `{$dbinfo_tablename}` WHERE \`msg_id\` = ? LIMIT 1";
+        $query = "SELECT * FROM `{$dbinfo_tablename}` WHERE `msg_id` = ? LIMIT 1";
 
         $stmt = $db->prepare($query);
         $stmt->bindParam(1, $msg_id, PDO::PARAM_INT);
