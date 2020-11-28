@@ -68,7 +68,7 @@ $count = count($data);
 <link href="template/css/bootstrap.min.css" rel="stylesheet">
 <link href="template/css/bootstrap.css" rel="stylesheet">
 </head>
-<body><br/>
+<body onload="brython()"><br/>
 	<div class="container">
 		<nav class="navbar navbar-default" role="navigation">
 			<div class="navbar-header">
