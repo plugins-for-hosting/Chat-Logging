@@ -16,21 +16,13 @@ header('Content-Type: text/html; charset=utf-8');
 
 $gameinfo = "TF2"; // CSS or TF2
 
-# Information for connecting to database
-$dbinfo_hostname = "";     // Host
-$dbinfo_username = ""; // Username
-$dbinfo_password = "";      // Password
-$dbinfo_dbtable = "";  // Database Name
-$dbinfo_tablename = "chatlog"; // Table name (cvar sm_chat_log_table)
-
-$dbinfo_link = "mysql:host=" . $dbinfo_hostname . ";dbname=" . $dbinfo_dbtable . "";
+require_once("./dbinfo.php");
 
 # Database connection
 try 
 { 
 	$db = new PDO($dbinfo_link, $dbinfo_username, $dbinfo_password);
 	$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	$db->exec("SET NAMES 'utf8mb4'");
 }
 
 catch(PDOException $e) 
@@ -61,6 +53,9 @@ $count = count($data);
 <html lang="en">
 <head>
 <title>Chat Logging</title>
+<meta charset="utf-8">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.0/brython.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.0/brython_stdlib.js"></script>
 <link href="template/css/bootstrap.min.css" rel="stylesheet">
 <link href="template/css/bootstrap.css" rel="stylesheet">
 </head>
@@ -113,7 +108,7 @@ $count = count($data);
 						$say_team = (bool)($msg_info['type'] == "say_team");
  					
 						# time that message wrote
-						print "<strong><span class=\"text-info\">[" . date("Y-m-d H:i:s", $msg_info['timestamp']) . "]</span> ";
+						echo("<strong class='class_chatlog' id='{$msg_info["msg_id"]}'><span class=\"text-info\">[" . date("Y-m-d H:i:s", $msg_info['timestamp']) . "]</span> ");
 						
 						# in spectator/in team - true/false
 						$ingame = (bool)($msg_info['team'] == 0);
@@ -195,5 +190,18 @@ $count = count($data);
     <script src="template/js/bootstrap.min.js"></script>
 	<script src="template/js/bootstrap-scrollspy.js"></script>
 	
+	<script type="text/python">
+from browser import document, html, ajax, bind
+from browser.widgets.dialog import Dialog
+@bind("strong.class_chatlog", "click")
+def onclick(ev):
+	left = ev.x
+	top = ev.y
+
+	ev.target.attrs["id"]
+
+	d = Dialog("Test", ok_cancel=True);
+	pass
+	</script>
 </body>
 </html>
