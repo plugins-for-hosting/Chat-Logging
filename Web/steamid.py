@@ -1,5 +1,5 @@
 import json
-from browser import document, html, ajax, bind, console
+from browser import document, html, ajax, bind, console, window
 from browser.widgets.dialog import Dialog, InfoDialog
 @bind("strong.class_chatlog", "click")
 def onclick(ev):
@@ -13,15 +13,20 @@ def onclick(ev):
             left = ev.x
             top = ev.y
 
-            d = Dialog("Name : " + name, ok_cancel=True)
+            d = Dialog("Name : " + name, ok_cancel=True, top=top, left=left)
 
-            d.panel <= html.DIV("SteamID : " + steamid)
+            d.panel <= html.DIV("SteamID :" + html.INPUT(type="text", value=steamid, readonly="readonly"))
+            d.panel <= html.DIV("Click okay if you want to get redirected to steamrep.")
+
+            @bind(d.ok_button, "click")
+            def ok(ev):
+                steamid = d.select_one("INPUT").value
+
+                window.location.href = "https://steamrep.com/search?q=" + steamid
+                pass
+
         else:
             InfoDialog("Error", "It is unable to connect to api server.")
     
-    req = ajax.get('./api.php?msg_id=' + str(ev.currentTarget.id), oncomplete=on_complete)
-
-@bind(d.ok_button, "click")
-def ok(ev):
-    pass
+    ajax.get('./api.php?msg_id=' + str(ev.currentTarget.id), oncomplete=on_complete)
     
