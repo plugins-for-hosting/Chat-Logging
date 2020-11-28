@@ -19,7 +19,7 @@ def onclick(ev):
         else:
             InfoDialog("Error", "It is unable to connect to api server.")
     
-    req = ajax.get('./api.php', data={'msg_id': ev.currentTarget.id}, oncomplete=on_complete)
+    req = ajax.get('./api.php?msg_id=' + str(ev.currentTarget.id), oncomplete=on_complete)
 
 @bind(d.ok_button, "click")
 def ok(ev):
