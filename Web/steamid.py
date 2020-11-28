@@ -18,11 +18,10 @@ def onclick(ev):
             d.panel <= html.DIV("SteamID : " + steamid);
         else
             InfoDialog("Error", "It is unable to connect to api server.")
+    
+    req = ajax.get('./api.php', data={'msg_id': ev.currentTarget.id})
 
 @bind(d.ok_button, "click")
 def ok(ev):
     pass
-            
-	
-    req = ajax.get('./api.php', data={'msg_id': ev.currentTarget.id})
     
