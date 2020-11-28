@@ -223,10 +223,12 @@ $count = count($data);
 	<script src="template/js/bootstrap-scrollspy.js"></script>
 	
 	<script type="text/python">
-from browser import document, html, ajax, bind
+from browser import document, html, ajax, bind, console
 from browser.widgets.dialog import Dialog
 @bind("strong.class_chatlog", "click")
 def onclick(ev):
+	
+	console.log("You've clicked.")
 	left = ev.x
 	top = ev.y
 
