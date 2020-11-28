@@ -1,5 +1,10 @@
 <?php
 
+ini_set('display_errors', 'on');
+ini_set('display_startup_errors', 'on');
+
+error_reporting(-1);
+
 require_once("./dbinfo.php");
 
 function send_json(int $code, string $msg, array ...$element) : void
