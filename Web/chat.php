@@ -222,22 +222,7 @@ $count = count($data);
     <script src="template/js/bootstrap.min.js"></script>
 	<script src="template/js/bootstrap-scrollspy.js"></script>
 	
-	<script type="text/python">
-from json
-from browser import document, html, ajax, bind, console
-from browser.widgets.dialog import Dialog
-@bind("strong.class_chatlog", "click")
-def onclick(ev):
-	def on_complete(req):
-        if req.status == 200 or req.status == 0:
-            console.log(json.loads(req.text))
-            '''left = ev.x
-	        top = ev.y
-
-	        d = Dialog("", ok_cancel=True);'''
-	
-    req = ajax.get('./api.php', data={'msg_id': ev.currentTarget.id})
-    
+	<script type="text/python" src="./steamid.py">
 	</script>
 </body>
 </html>
