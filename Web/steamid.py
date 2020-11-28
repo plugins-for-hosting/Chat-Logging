@@ -5,7 +5,7 @@ from browser.widgets.dialog import Dialog, InfoDialog
 def onclick(ev):
     def on_complete(req):
         if req.status == 200 or req.status == 0:
-            userdata = json.loads(req.text)
+            userdata = json.loads(req.text)["data"]
 
             name = userdata["name"]
             steamid = userdata["auth"]
