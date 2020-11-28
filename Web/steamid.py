@@ -15,7 +15,7 @@ def onclick(ev):
 
             d = Dialog("Name : " + name, ok_cancel=True, top=top, left=left)
 
-            d.panel <= html.DIV("SteamID :" + html.INPUT(type="text", value=steamid, readonly="readonly", style={"width":"auto"}), style={"width":"auto"})
+            d.panel <= html.DIV("SteamID :" + html.INPUT(type="text", value=steamid, readonly="readonly", style={"width":"200px"}), style={"width":"auto"})
             d.panel <= html.DIV("Click okay if you want to get redirected to steamrep.")
 
             @bind(d.ok_button, "click")
