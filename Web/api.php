@@ -2,10 +2,30 @@
 
 require_once("./dbinfo.php");
 
+function send_json(int $code, string $msg, array ...$element) : void
+{
+    $assoc = array(
+        "code" => $code,
+        "msg" => $msg,
+    );
+
+    if(isset($element) && !empty($element))
+    {
+        $assoc["data"] = array_merge(...$element);
+    }
+
+    $file = json_encode($assoc, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+    header("{$_SERVER["SERVER_PROTOCOL"]} {$code} {$msg}");
+    header("Content-Type: application/json");
+    header("Content-Length: " . strlen($file));
+    exit($file);
+}
+
 if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
 {
-    if(is_numeric($_GET["msg_id"]))
-        exit("msg_id is not valid integer.");
+    if(!is_numeric($_GET["msg_id"]))
+        send_json(400, "Bad Request", array("error_msg" => "query 'msg_id' is not valid number."));
     
     $msg_id = intval($_GET["msg_id"]);
 
@@ -14,15 +34,14 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
         $db = new PDO($dbinfo_link, $dbinfo_username, $dbinfo_password);
         $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $db->exec("SET NAMES 'utf8'");
 
-        $query = "SELECT * FROM ? WHERE `msg_id` = ?";
+        $query = "SELECT * FROM `{$dbinfo_tablename}` WHERE \`msg_id\` = ? LIMIT 1";
 
         $stmt = $db->prepare($query);
-        $stmt->execute(array($dbinfo_tablename, $msg_id));
-        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->bindParam(1, $msg_id, PDO::PARAM_INT);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        print_r($result);
+        send_json(200, "OK", $result);
     
     }
     catch(PDOException $e) 
