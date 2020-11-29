@@ -153,7 +153,6 @@ $count = count($data);
                         if ($msg_info['team'] > 1 && !$msg_info['alive']) echo("<span style=\"color: #ffb000;\">*DEAD*</span> ");
                         
                         # Prefixes depending on the type of message (basechat)
-                        $msg_type = "";
                         if(isset($msg_info["type"]))
                         {
                             switch ($msg_info['type'])
@@ -182,7 +181,7 @@ $count = count($data);
                                     $msg_type = "[CSAY]";
                                     break;
                             }
-                            echo("<span class=\"text-success\">[HSAY]</span>");
+                            echo("<span class=\"text-success\">{$msg_type}</span>");
                         }
                         
                         # Nickname color
