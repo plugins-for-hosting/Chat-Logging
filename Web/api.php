@@ -95,7 +95,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]) && isset($_GET["
         $stmt = $db->prepare($query);
         $stmt->bindParam(":msg_id", $msg_id, PDO::PARAM_INT);
         $stmt->execute();
-        $result = $stmt->fetchALL(PDO::FETCH_CLASS);
+        $result = $stmt->fetchALL(PDO::FETCH_CLASS, "MSG");
 
         if(!isset($result) || $result === false)
         {
@@ -115,7 +115,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]) && isset($_GET["
             );
         }
 
-        send_json(200, "OK", array("last_msg_id" => end($result)["msg_id"], "rows" => $array));
+        send_json(200, "OK", array("last_msg_id" => end($result)->msg_id, "rows" => $array));
     }
     catch(PDOException $e) 
     {
