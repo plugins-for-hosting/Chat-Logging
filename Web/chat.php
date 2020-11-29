@@ -51,7 +51,7 @@ unset($result);
 $row_count = $data["count"];
 unset($data);
 
-if(!(($page - 1) * $maxlog_per_page <= $data["count"]))
+if(!(($page - 1) * $maxlog_per_page <= $row_count))
     $page = floor($row_count / $maxlog_per_page) + 1;
 
 $begin = ($page - 1) * $maxlog_per_page;
