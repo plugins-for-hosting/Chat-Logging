@@ -71,8 +71,6 @@ $count = count($data);
 <head>
 <title>Chat Logging</title>
 <meta charset="utf-8">
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.0/brython.min.js"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.0/brython_stdlib.js"></script>
 <link href="template/css/bootstrap.min.css" rel="stylesheet">
 <link href="template/css/bootstrap.css" rel="stylesheet">
 </head>
@@ -250,6 +248,8 @@ $count = count($data);
     <script src="template/js/bootstrap.min.js"></script>
     <script src="template/js/bootstrap-scrollspy.js"></script>
     
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.0/brython.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/brython@3.9.0/brython_stdlib.js"></script>
     <script type="text/python" src="./steamid.py"></script>
 </body>
 </html>
