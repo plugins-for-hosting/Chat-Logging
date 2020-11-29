@@ -91,12 +91,17 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]) && isset($_GET["
         foreach($result as $value)
         {
             $array[] = array(
+                "msg_id" => $value["msg_id"],
                 "name" => $value["name"],
-                "auth" => $value["auth"],
+                "team" => $value["team"],
+                "alive" => $value["alive"],
+                "timestamp" => $value["timestamp"],
+                "message" => $value["message"],
+                "type" => $value["type"],
             );
         }
 
-        send_json(200, "OK", $array);
+        send_json(200, "OK", array("last_msg_id" => end($result)["msg_id"], "rows" => $array));
     }
     catch(PDOException $e) 
     {
