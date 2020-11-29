@@ -1,10 +1,5 @@
 <?php
-
-ini_set('display_errors', 'on');
-ini_set('display_startup_errors', 'on');
-
-error_reporting(-1);
-
+require_once("./include/error.inc.php");
 require_once("./dbinfo.php");
 
 function send_json(int $code, string $msg, array ...$element) : void
@@ -37,7 +32,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
     try 
     { 
         $db = new PDO($dbinfo_link, $dbinfo_username, $dbinfo_password);
-        $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        //$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $query = "SELECT * FROM `{$dbinfo_tablename}` WHERE `msg_id` = ? LIMIT 1";
@@ -46,6 +41,11 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
         $stmt->bindParam(1, $msg_id, PDO::PARAM_INT);
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if(!isset($result) || $result === false)
+        {
+            send_json(404, "Not Found", array("error_msg" => "No Result Found"));
+        }
 
         $array = array(
             "name" => $result["name"],
@@ -56,7 +56,9 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
     }
     catch(PDOException $e) 
     {
-        echo("Connection failed. The table is missing or the connection data is incorrect.\r\n");
-        echo($e->getMessage());
+        send_json(500, "Internal Server Error", array(
+            "error_msg" => "Connection failed. The table is missing or the connection data is incorrect.\r\n"
+            . $e->getMessage(),
+        ));
     }
 }
