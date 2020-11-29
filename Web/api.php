@@ -22,6 +22,20 @@ function send_json(int $code, string $msg, array ...$element) : void
     exit($file);
 }
 
+Class MSG
+{
+    public int$msg_id;
+    public int $server_id;
+    public string $auth;
+    public string $ip;
+    public string $name;
+    public int $team;
+    public int $alive;
+    public int $timestamp;
+    public string $message;
+    public string $type;
+}
+
 if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
 {
     if(!is_numeric($_GET["msg_id"]))
@@ -81,7 +95,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]) && isset($_GET["
         $stmt = $db->prepare($query);
         $stmt->bindParam(":msg_id", $msg_id, PDO::PARAM_INT);
         $stmt->execute();
-        $result = $stmt->fetchALL(PDO::FETCH_ASSOC);
+        $result = $stmt->fetchALL(PDO::FETCH_CLASS);
 
         if(!isset($result) || $result === false)
         {
@@ -91,13 +105,13 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]) && isset($_GET["
         foreach($result as $value)
         {
             $array[] = array(
-                "msg_id" => $value["msg_id"],
-                "name" => $value["name"],
-                "team" => $value["team"],
-                "alive" => $value["alive"],
-                "timestamp" => $value["timestamp"],
-                "message" => $value["message"],
-                "type" => $value["type"],
+                "msg_id" => $value->msg_id,
+                "name" => $value->name,
+                "team" => $value->team,
+                "alive" => $value->alive,
+                "timestamp" => $value->timestamp,
+                "message" => $value->message,
+                "type" => $value->type,
             );
         }
 
