@@ -62,3 +62,44 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
         ));
     }
 }
+
+if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]) && isset($_GET["live_msg_id"]))
+{
+    if(!is_numeric($_GET["live_msg_id"]))
+        send_json(400, "Bad Request", array("error_msg" => "query 'live_msg_id' is not valid number."));
+    
+    $msg_id = intval($_GET["live_msg_id"]);
+
+    try 
+    { 
+        $db = new PDO($dbinfo_link, $dbinfo_username, $dbinfo_password);
+        //$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $query = "SELECT * FROM `{$dbinfo_tablename}` WHERE `msg_id` > :msg_id ORDER BY `msg_id` ASC";
+
+        $stmt = $db->prepare($query);
+        $stmt->bindParam(":msg_id", $msg_id, PDO::PARAM_INT);
+        $stmt->execute();
+        $result = $stmt->fetchALL(PDO::FETCH_ASSOC);
+
+        if(!isset($result) || $result === false)
+        {
+            send_json(404, "Not Found", array("error_msg" => "No Result Found"));
+        }
+
+        $array = array(
+            "name" => $result["name"],
+            "auth" => $result["auth"],
+        );
+
+        send_json(200, "OK", $array);
+    }
+    catch(PDOException $e) 
+    {
+        send_json(500, "Internal Server Error", array(
+            "error_msg" => "Connection failed. The table is missing or the connection data is incorrect.\r\n"
+            . $e->getMessage(),
+        ));
+    }
+}
