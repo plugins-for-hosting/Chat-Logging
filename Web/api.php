@@ -76,7 +76,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]) && isset($_GET["
         //$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $query = "SELECT * FROM `{$dbinfo_tablename}` WHERE `msg_id` > :msg_id ORDER BY `msg_id` ASC";
+        $query = "SELECT * FROM `{$dbinfo_tablename}` WHERE `msg_id` > :msg_id ORDER BY `msg_id` ASC LIMIT 256";
 
         $stmt = $db->prepare($query);
         $stmt->bindParam(":msg_id", $msg_id, PDO::PARAM_INT);
@@ -88,10 +88,13 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]) && isset($_GET["
             send_json(404, "Not Found", array("error_msg" => "No Result Found"));
         }
 
-        $array = array(
-            "name" => $result["name"],
-            "auth" => $result["auth"],
-        );
+        foreach($result as $value)
+        {
+            $array[] = array(
+                "name" => $value["name"],
+                "auth" => $value["auth"],
+            );
+        }
 
         send_json(200, "OK", $array);
     }
