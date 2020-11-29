@@ -60,9 +60,9 @@ $stmt = $db->prepare("SELECT * FROM `{$dbinfo_tablename}` ORDER BY `msg_id` DESC
 $stmt->bindParam(":begin_from", $begin, PDO::PARAM_INT);
 $stmt->bindParam(":maxlog_per_page", $maxlog_per_page, PDO::PARAM_INT);
 $stmt->execute();
-$data = $result->fetchAll(PDO::FETCH_ASSOC);
-$result->closeCursor();
-unset($result);
+$data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
+unset($stmt);
 $count = count($data);
 
 ?>
