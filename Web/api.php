@@ -77,12 +77,10 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
     }
 }
 
-if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]) && isset($_GET["live_msg_id"]))
+if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
 {
-    if(!is_numeric($_GET["live_msg_id"]))
-        send_json(400, "Bad Request", array("error_msg" => "query 'live_msg_id' is not valid number."));
-    
-    $msg_id = intval($_GET["live_msg_id"]);
+    if(($is_msg_id_set = is_numeric($_GET["live_msg_id"])))
+        $msg_id = intval($_GET["live_msg_id"]);
 
     try 
     { 
@@ -90,10 +88,20 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]) && isset($_GET["
         //$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $query = "SELECT * FROM `{$dbinfo_tablename}` WHERE `msg_id` > :msg_id ORDER BY `msg_id` ASC LIMIT 256";
+        if ($is_msg_id_set)
+        {
+            $query = "SELECT * FROM `{$dbinfo_tablename}` WHERE `msg_id` > :msg_id ORDER BY `msg_id` ASC LIMIT 256";
+        }
+        else
+        {
+            $query = "SELECT * FROM (SELECT * FROM `{$dbinfo_tablename}` ORDER BY `msg_id` DESC LIMIT 256) as `logs` ORDER BY `msg_id` ASC";
+        }
 
         $stmt = $db->prepare($query);
-        $stmt->bindParam(":msg_id", $msg_id, PDO::PARAM_INT);
+        if ($is_msg_id_set)
+        {
+            $stmt->bindParam(":msg_id", $msg_id, PDO::PARAM_INT);
+        }
         $stmt->execute();
         $result = $stmt->fetchALL(PDO::FETCH_CLASS, "MSG");
 

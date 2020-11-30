@@ -190,7 +190,7 @@ $count = count($data);
                         {
                             switch ($gameinfo)
                             {
-                                case "CSS":
+                                case "CS":
                                     switch((int)$msg_info['team'])
                                     {
                                         case 2:
