@@ -233,7 +233,9 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
             );
         }
 
-        send_json(200, "OK", array("last_msg_id" => end($result)->msg_id, "rows" => $array));
+        $last_msg_id = isset(end($result)->msg_id) ? end($result)->msg_id : $msg_id;
+
+        send_json(200, "OK", array("last_msg_id" => $last_msg_id, "rows" => $array));
     }
     catch(PDOException $e) 
     {
