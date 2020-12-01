@@ -145,7 +145,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
                 $html .= "<span style=\"color: #ffb000;\">*DEAD*</span> ";
             
             # Prefixes depending on the type of message (basechat)
-            if(isset($value["type"]))
+            if(isset($value->type))
             {
                 switch ($value->type)
                 {
