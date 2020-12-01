@@ -12,5 +12,5 @@ from browser.widgets.dialog import Dialog, InfoDialog # pylint: disable=import-e
 import steamid
 
 def on_complete(req):
-
+    pass
 
