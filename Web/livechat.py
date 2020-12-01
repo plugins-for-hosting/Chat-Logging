@@ -44,10 +44,15 @@ def on_complete(req):
 def timeout_loop():
     global last_msg_id
 
-    if last_msg_id:
-        url = "./api.php?live=" + gameinfo + "&live_msg_id=" + str(last_msg_id)
-    else:
+    try:
+        last_msg_id
+    except NameError:
         url = "./api.php?live=" + gameinfo
+    else:
+        if last_msg_id:
+            url = "./api.php?live=" + gameinfo + "&live_msg_id=" + str(last_msg_id)
+        else:
+            url = "./api.php?live=" + gameinfo
 
     ajax.get(url=url, oncomplete=on_complete)
 
