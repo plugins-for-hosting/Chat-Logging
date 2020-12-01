@@ -24,16 +24,16 @@ function send_json(int $code, string $msg, array ...$element) : void
 
 Class MSG
 {
-    public int$msg_id;
-    public int $server_id;
-    public string $auth;
-    public string $ip;
-    public string $name;
-    public int $team;
-    public int $alive;
-    public int $timestamp;
-    public string $message;
-    public string $type;
+    public $msg_id;
+    public $server_id;
+    public $auth;
+    public $ip;
+    public $name;
+    public $team;
+    public $alive;
+    public $timestamp;
+    public $message;
+    public $type;
 }
 
 if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
@@ -79,7 +79,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
 
 if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
 {
-    if(($is_msg_id_set = is_numeric($_GET["live_msg_id"])))
+    if(isset($_GET["live_msg_id"]) && ($is_msg_id_set = is_numeric($_GET["live_msg_id"])))
         $msg_id = intval($_GET["live_msg_id"]);
 
     try 
@@ -186,6 +186,8 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
             # Team chat - prefix
             if($say_team) 
             {
+                $gameinfo = $_GET["live"];
+                $team = "";
                 switch ($gameinfo)
                 {
                     case "CS":
@@ -239,7 +241,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
 
         $last_msg_id = isset(end($result)->msg_id) ? end($result)->msg_id : $msg_id;
 
-        send_json(200, "OK", array("last_msg_id" => $last_msg_id, "rows" => $array));
+        send_json(200, "OK", array("last_msg_id" => intval($last_msg_id), "rows" => $array));
     }
     catch(PDOException $e) 
     {
