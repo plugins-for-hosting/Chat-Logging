@@ -40,9 +40,9 @@ def timeout_loop():
     try:
         last_msg_id
     except NameError:
-        url = "./livechat.php?live=" + gameinfo
+        url = "./api.php?live=" + gameinfo
     else:
-        url = "./livechat.php?live=" + gameinfo + "&live_msg_id=" + str(msg_id)
+        url = "./api.php?live=" + gameinfo + "&live_msg_id=" + str(msg_id)
 
     ajax.get(url=url, oncomplete=on_complete)
 
