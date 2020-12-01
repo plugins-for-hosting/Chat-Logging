@@ -12,6 +12,9 @@ from browser import document, html, ajax, bind, window, timer # pylint: disable=
 from browser.widgets.dialog import Dialog, InfoDialog # pylint: disable=import-error
 import steamid
 
+panelbody = document.select("div.panel-body")[0]
+
+
 def on_complete(req):
     if req.status == 200 or req.status == 0:
         data = json.loads(req.text)["data"]
@@ -21,16 +24,20 @@ def on_complete(req):
 
         rows = data["rows"]
 
-        print(rows)
+        isScrolledToBottom = panelbody.scrollHeight - panelbody.clientHeight <= panelbody.scrollTop + 1
 
-        for value in rows:
-            log_html = html.STRONG(value["html"], id=value["msg_id"], Class="class_chatlog")
+        if rows:
+            for value in rows:
+                log_html = html.STRONG(value["html"], id=value["msg_id"], Class="class_chatlog")
 
-            @bind(log_html, "click")
-            def onclick(ev):
-                steamid.prompt_steamid_dialog(ev.currentTarget.id, ev.clientX, ev.clientY)
+                @bind(log_html, "click")
+                def onclick(ev):
+                    steamid.prompt_steamid_dialog(ev.currentTarget.id, ev.clientX, ev.clientY)
             
-            document.select("div.panel-body")[0] <= log_html + html.BR()
+                panelbody <= log_html + html.BR()
+        
+        if isScrolledToBottom:
+            panelbody.scrollTop = panelbody.scrollHeight - panelbody.clientHeight
 
     timer.set_timeout(timeout_loop, 3000)
 
@@ -47,3 +54,4 @@ def timeout_loop():
     ajax.get(url=url, oncomplete=on_complete)
 
 timeout_loop()
+

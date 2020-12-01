@@ -54,7 +54,7 @@ catch(PDOException $e)
                 Live Chat:
                 <div class="panel panel-default">
                     <div class="panel-heading">Chat</div>
-                    <div class="panel-body">
+                    <div class="panel-body" "overflow:auto; height:750px'">
 
                     </div>
                 </div>
