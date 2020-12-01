@@ -45,3 +45,5 @@ def timeout_loop():
         url = "./livechat.php?live=" + gameinfo + "&live_msg_id=" + str(msg_id)
 
     ajax.get(url=url, oncomplete=on_complete)
+
+timeout_loop()
