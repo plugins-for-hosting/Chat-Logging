@@ -179,7 +179,10 @@ $count = count($data);
                                     $msg_type = "[CSAY]";
                                     break;
                             }
-                            echo("<span class=\"text-success\">{$msg_type}</span>");
+                            if(isset($msg_type))
+                            {
+                                echo("<span class=\"text-success\">{$msg_type}</span>");
+                            }
                         }
                         
                         # Nickname color

@@ -63,7 +63,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
 
         $array = array(
             "name" => $result["name"],
-            "auth" => $result["auth"],
+            "auth" => $result["auth"]
         );
 
         send_json(200, "OK", $array);
@@ -72,7 +72,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
     {
         send_json(500, "Internal Server Error", array(
             "error_msg" => "Connection failed. The table is missing or the connection data is incorrect.\r\n"
-            . $e->getMessage(),
+            . $e->getMessage()
         ));
     }
 }
@@ -173,7 +173,11 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
                         $msg_type = "[CSAY]";
                         break;
                 }
-                $html .= "<span class=\"text-success\">{$msg_type}</span>";
+
+                if(isset($msg_type))
+                {
+                    $html .= "<span class=\"text-success\">{$msg_type}</span>";
+                }
             }
             
             # Nickname color
@@ -229,7 +233,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
 
             $array[] = array(
                 "msg_id" => $value->msg_id,
-                "html" => $html,
+                "html" => $html
             );
         }
 
@@ -241,7 +245,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
     {
         send_json(500, "Internal Server Error", array(
             "error_msg" => "Connection failed. The table is missing or the connection data is incorrect.\r\n"
-            . $e->getMessage(),
+            . $e->getMessage()
         ));
     }
 }
