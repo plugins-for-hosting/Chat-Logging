@@ -30,9 +30,9 @@ def on_complete(req):
             def onclick(ev):
                 steamid.prompt_steamid_dialog(ev.currentTarget.id, ev.clientX, ev.clientY)
             
-            document.select("div.panel-body")[0] <= log_html
+            document.select("div.panel-body")[0] <= log_html + html.BR()
 
-    timer.set_timeout(3000, timeout_loop)
+    timer.set_timeout(timeout_loop, 3000)
 
 def timeout_loop():
     global last_msg_id
