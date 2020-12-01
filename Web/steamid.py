@@ -2,7 +2,7 @@ import json
 from browser import document, html, ajax, bind, console, window # pylint: disable=import-error
 from browser.widgets.dialog import Dialog, InfoDialog # pylint: disable=import-error
 
-def prompt_steamid_dialog(msg_id, top, left):
+def prompt_steamid_dialog(msg_id, x, y):
     def on_complete(req):
         if req.status == 200 or req.status == 0:
             userdata = json.loads(req.text)["data"]
@@ -10,8 +10,8 @@ def prompt_steamid_dialog(msg_id, top, left):
             name = userdata["name"]
             steamid = userdata["auth"]
 
-            left = top
-            top = left
+            left = x
+            top = y
 
             d = Dialog("Name : " + name, ok_cancel=True, top=top, left=left)
 
