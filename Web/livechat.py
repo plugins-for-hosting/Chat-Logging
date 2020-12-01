@@ -19,7 +19,7 @@ def on_complete(req):
         global last_msg_id
         last_msg_id = data["last_msg_id"]
 
-        rows = data["data"]
+        rows = data["rows"]
 
         print(document.select("div.panel-body")[0])
 
