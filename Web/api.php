@@ -114,7 +114,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
         {
             # Team colors (bootstrap css class text-*)
             $ingame = true;
-            switch((int)$value['team'])
+            switch((int)$value->team)
             {
                 case 1:
                     $textcolor = "muted";
@@ -132,22 +132,22 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
             }
             
             # Team chat - true/false
-            $say_team = (bool)($value['type'] == "say_team");
+            $say_team = (bool)($value->type == "say_team");
             
             # time that message wrote
-            $html = "<span class=\"text-info\">[" . date("Y-m-d H:i:s", $value['timestamp']) . "]</span> ";
+            $html = "<span class=\"text-info\">[" . date("Y-m-d H:i:s", $value->timestamp) . "]</span> ";
             
             # in spectator/in team - true/false
-            $ingame = (bool)($value['team'] == 0);
+            $ingame = (bool)($value->team == 0);
             
             # Player is alive / dead
-            if ($value['team'] > 1 && !$value['alive'])
+            if ($value->team > 1 && !$value->alive)
                 $html .= "<span style=\"color: #ffb000;\">*DEAD*</span> ";
             
             # Prefixes depending on the type of message (basechat)
             if(isset($value["type"]))
             {
-                switch ($value['type'])
+                switch ($value->type)
                 {
                     case "sm_hsay":
                         $msg_type = "[HSAY]";
@@ -185,7 +185,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
                 switch ($gameinfo)
                 {
                     case "CS":
-                        switch((int)$value['team'])
+                        switch((int)$value->team)
                         {
                             case 2:
                                 $team = "(TERRORISTS)";
@@ -201,7 +201,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
                         break;
                         
                     case "TF2":
-                        switch((int)$value['team'])
+                        switch((int)$value->team)
                         {
                             case 2:
                                 $team = "(RED)";
@@ -221,10 +221,10 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
             }
             
             # Nickname of the player who wrote the message
-            $html .= " {$value['name']}:</span> ";
+            $html .= " {$value->name}:</span> ";
             
             # Message text (if psay - hide)
-            $message = ($value['type'] == "sm_psay") ? "*PRIVATE MESSAGE*" : $value['message'];
+            $message = ($value->type == "sm_psay") ? "*PRIVATE MESSAGE*" : $value->message;
             $html .= "<span style=\"color: #ffb000;\">{$message}</span>";
 
             $array[] = array(
