@@ -21,7 +21,7 @@ def on_complete(req):
 
         rows = data["rows"]
 
-        print(document.select("div.panel-body")[0])
+        print(rows)
 
         for value in rows:
             log_html = html.STRONG(value["html"], id=value["msg_id"], Class="class_chatlog")
