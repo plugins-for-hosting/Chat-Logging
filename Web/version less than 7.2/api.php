@@ -24,16 +24,16 @@ function send_json(int $code, string $msg, array ...$element) : void
 
 Class MSG
 {
-    public int $msg_id;
-    public int $server_id;
-    public string $auth;
-    public string $ip;
-    public string $name;
-    public int $team;
-    public int $alive;
-    public int $timestamp;
-    public string $message;
-    public string $type;
+    public $msg_id;
+    public $server_id;
+    public $auth;
+    public $ip;
+    public $name;
+    public $team;
+    public $alive;
+    public $timestamp;
+    public $message;
+    public $type;
 }
 
 if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))

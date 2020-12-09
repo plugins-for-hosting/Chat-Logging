@@ -79,7 +79,7 @@ $count = count($data);
         <nav class="navbar navbar-default" role="navigation">
             <div class="navbar-header">
                 <a class="navbar-brand">Chat Logging</a>
-                <p class="navbar-text pull-right">Chat Log</p>
+                <p class="navbar-text pull-right"><a href="./livechat.php">Go Live</a></p>
             </div>
         </nav>
         <div class="row">

@@ -42,7 +42,7 @@ def on_complete(req):
             InfoDialog("Error", "Can not connect to api server.")
             exit()
 
-        timer.set_timeout(timeout_loop, 2000)
+    timer.set_timeout(timeout_loop, 2000)
 
 def timeout_loop():
     try:

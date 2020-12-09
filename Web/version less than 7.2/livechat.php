@@ -1,37 +1,11 @@
 <?php
 
-/*
-* Chat Logging v 1.0
-*
-* Author web-side: Webman
-* Copyright @ 2014
-*
-* Changelog:
-* v1.0 - First release.
-*/
 require_once("./include/error.inc.php");
 
 header('Content-Type: text/html; charset=utf-8');
 
-# Game info
-
 $gameinfo = "TF2"; // CS(Counter Strike) or TF2(Team Fortress 2)
 
-/*
-require_once("./dbinfo.php");
-
-# Database connection
-try 
-{ 
-    $db = new PDO($dbinfo_link, $dbinfo_username, $dbinfo_password);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-}
-
-catch(PDOException $e) 
-{
-    echo("Connection failed. The table is missing or the connection data is incorrect.");
-}
-*/
 ?>
 
 <html lang="en">
@@ -46,7 +20,7 @@ catch(PDOException $e)
         <nav class="navbar navbar-default" role="navigation">
             <div class="navbar-header">
                 <a class="navbar-brand">Chat Logging</a>
-                <p class="navbar-text pull-right">Chat Log</p>
+                <p class="navbar-text pull-right"><a href="./index.php">Go Static</a></p>
             </div>
         </nav>
         <div class="row">
