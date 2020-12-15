@@ -12,7 +12,7 @@ from browser import document, html, ajax, bind, window, timer # pylint: disable=
 from browser.widgets.dialog import Dialog, InfoDialog # pylint: disable=import-error
 import steamid
 
-panelbody = document.select("div.panel-body")[0]
+panelbody = document.select_one("div.panel-body")
 
 def on_complete(req):
     if req.status == 200 or req.status == 0:
@@ -30,13 +30,15 @@ def on_complete(req):
                 for value in rows:
                     log_html = html.STRONG(value["html"], id=value["msg_id"], Class="class_chatlog")
 
-                    del log_html[0]
 
                     @bind(log_html, "click")
                     def onclick(ev):
                         steamid.prompt_steamid_dialog(ev.currentTarget.id, ev.clientX, ev.clientY)
             
                     panelbody <= log_html + html.BR()
+            
+            if panelbody.childElementCount > 1024:
+                del panelbody.firstChild
         
             if isScrolledToBottom:
                 panelbody.scrollTop = panelbody.scrollHeight - panelbody.clientHeight
