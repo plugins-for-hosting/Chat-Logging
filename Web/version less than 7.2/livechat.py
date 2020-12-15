@@ -30,6 +30,8 @@ def on_complete(req):
                 for value in rows:
                     log_html = html.STRONG(value["html"], id=value["msg_id"], Class="class_chatlog")
 
+                    del log_html[0]
+
                     @bind(log_html, "click")
                     def onclick(ev):
                         steamid.prompt_steamid_dialog(ev.currentTarget.id, ev.clientX, ev.clientY)
