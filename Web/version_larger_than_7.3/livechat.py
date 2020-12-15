@@ -37,7 +37,7 @@ def on_complete(req):
             
                     panelbody <= log_html + html.BR()
             
-            if panelbody.childElementCount > 1024:
+            while panelbody.childElementCount > 1024:
                 del panelbody.firstChild
         
             if isScrolledToBottom:
