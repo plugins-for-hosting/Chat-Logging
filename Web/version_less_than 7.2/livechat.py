@@ -37,8 +37,9 @@ def on_complete(req):
             
                     panelbody <= log_html + html.BR()
             
-            while panelbody.childElementCount > 1024:
-                del panelbody.firstChild
+            while len(panelbody.select("strong.class_chatlog")) > 512:
+                panelbody.removeChild(panelbody.select_one("strong.class_chatlog"))
+                panelbody.removeChild(panelbody.select_one("br"))
         
             if isScrolledToBottom:
                 panelbody.scrollTop = panelbody.scrollHeight - panelbody.clientHeight
