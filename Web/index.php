@@ -10,6 +10,7 @@
 * v1.0 - First release.
 */
 require_once("./include/error.inc.php");
+require_once("./include/result_prosess.php");
 
 header('Content-Type: text/html; charset=utf-8');
 
