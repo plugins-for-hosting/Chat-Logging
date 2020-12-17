@@ -22,18 +22,13 @@ function send_json(int $code, string $msg, array ...$element) : void
     exit($file);
 }
 
-Class MSG
+if(version_compare(PHP_VERSION, "7.3.0", ">="))
 {
-    public $msg_id;
-    public $server_id;
-    public $auth;
-    public $ip;
-    public $name;
-    public $team;
-    public $alive;
-    public $timestamp;
-    public $message;
-    public $type;
+    require_once("./msg_class/nlt7.3.php");
+}
+else
+{
+    require_once("./msg_class/lt7.3.php");
 }
 
 if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
