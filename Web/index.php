@@ -120,7 +120,7 @@ $count = count($data);
 
                     foreach ($data as $msg_info)
                     {
-                        echo(result_process($msg_info, $gameinfo) . '<br>');
+                        echo("<strong class='class_chatlog' id='{$msg_info["msg_id"]}'>" . result_process($msg_info, $gameinfo) . '</strong><br>');
                     }
 
                     # Closing the database connection
