@@ -1,6 +1,7 @@
 <?php
 require_once("./include/error.inc.php");
 require_once("./dbinfo.php");
+require_once("./include/result_prosess.php");
 
 function send_json(int $code, string $msg, array ...$element) : void
 {
@@ -22,19 +23,12 @@ function send_json(int $code, string $msg, array ...$element) : void
     exit($file);
 }
 
-if(version_compare(PHP_VERSION, "7.3.0", ">="))
-{
-    require_once("./msg_class/nlt7.3.php");
-}
-else
-{
-    require_once("./msg_class/lt7.3.php");
-}
-
 if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
 {
     if(!is_numeric($_GET["msg_id"]))
+    {
         send_json(400, "Bad Request", array("error_msg" => "query 'msg_id' is not valid number."));
+    }
     
     $msg_id = intval($_GET["msg_id"]);
 
@@ -42,6 +36,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["msg_id"]))
     { 
         $db = new PDO($dbinfo_link, $dbinfo_username, $dbinfo_password);
         //$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $db->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $query = "SELECT * FROM `{$dbinfo_tablename}` WHERE `msg_id` = ? LIMIT 1";
@@ -81,6 +76,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
     { 
         $db = new PDO($dbinfo_link, $dbinfo_username, $dbinfo_password);
         //$db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $db->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         if ($is_msg_id_set)
@@ -98,7 +94,7 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
             $stmt->bindParam(":msg_id", $msg_id, PDO::PARAM_INT);
         }
         $stmt->execute();
-        $result = $stmt->fetchALL(PDO::FETCH_CLASS, "MSG");
+        $result = $stmt->fetchALL(PDO::FETCH_ASSOC);
 
         if(!isset($result) || $result === false)
         {
@@ -107,126 +103,9 @@ if($_SERVER["REQUEST_METHOD"] === "GET" && isset($_GET["live"]))
 
         foreach($result as $value)
         {
-            # Team colors (bootstrap css class text-*)
-            $ingame = true;
-            switch((int)$value->team)
-            {
-                case 1:
-                    $textcolor = "muted";
-                    break;
-                case 2:
-                    $textcolor = "danger";
-                    break;
-                case 3:
-                    $textcolor = "primary";
-                    break;
-                default:
-                    $textcolor = "muted";
-                    $ingame = false;
-                    break;
-            }
-            
-            # Team chat - true/false
-            $say_team = (bool)($value->type == "say_team");
-            
-            # time that message wrote
-            $html = "<span class=\"text-info\">[" . date("Y-m-d H:i:s", $value->timestamp) . "]</span> ";
-            
-            # in spectator/in team - true/false
-            $ingame = (bool)($value->team == 0);
-            
-            # Player is alive / dead
-            if ($value->team > 1 && !$value->alive)
-                $html .= "<span style=\"color: #ffb000;\">*DEAD*</span> ";
-            
-            # Prefixes depending on the type of message (basechat)
-            if(isset($value->type))
-            {
-                switch ($value->type)
-                {
-                    case "sm_hsay":
-                        $msg_type = "[HSAY]";
-                        break;
-            
-                    case "sm_msay":
-                        $msg_type = "[MSAY]";
-                        break;
-            
-                    case "sm_psay":
-                        $msg_type = "[PRIVATE]";
-                        break;
-            
-                    case "sm_tsay":
-                        $msg_type = "[TSAY]";
-                        break;
-            
-                    case "sm_say":
-                        $msg_type = "(ALL)";
-                        break;
-            
-                    case "sm_csay":
-                        $msg_type = "[CSAY]";
-                        break;
-                }
+            $gameinfo = $_GET["live"];
 
-                if(isset($msg_type))
-                {
-                    $html .= "<span class=\"text-success\">{$msg_type}</span>";
-                }
-            }
-            
-            # Nickname color
-            $html .= "<span class=\"text-{$textcolor}\">";
-            
-            # Team chat - prefix
-            if($say_team) 
-            {
-                $gameinfo = $_GET["live"];
-                $team = "";
-                switch ($gameinfo)
-                {
-                    case "CS":
-                        switch((int)$value->team)
-                        {
-                            case 2:
-                                $team = "(TERRORISTS)";
-                                break;
-                            case 3:
-                                $team = "(COUNTER-TERRORISTS)";
-                                break;
-                            default:
-                                $team = "(SPECTATOR)";
-                                break;
-                        }
-                        
-                        break;
-                        
-                    case "TF2":
-                        switch((int)$value->team)
-                        {
-                            case 2:
-                                $team = "(RED)";
-                                break;
-                            case 3:
-                                $team = "(BLUE)";
-                                break;
-                            default:
-                                $team = "(SPECTATOR)";
-                                break;
-                        }
-                        
-                        break;
-                }
-            
-                $html .= $team;
-            }
-            
-            # Nickname of the player who wrote the message
-            $html .= " {$value->name}:</span> ";
-            
-            # Message text (if psay - hide)
-            $message = ($value->type == "sm_psay") ? "*PRIVATE MESSAGE*" : $value->message;
-            $html .= "<span style=\"color: #ffb000;\">{$message}</span>";
+            $html = result_process($value, $gameinfo);
 
             $array[] = array(
                 "msg_id" => $value->msg_id,

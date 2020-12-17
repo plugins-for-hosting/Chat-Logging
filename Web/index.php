@@ -74,7 +74,7 @@ $count = count($data);
 <link href="template/css/bootstrap.min.css" rel="stylesheet">
 <link href="template/css/bootstrap.css" rel="stylesheet">
 </head>
-<body onload="brython()"><br/>
+<body onload="brython()"><br>
     <div class="container">
         <nav class="navbar navbar-default" role="navigation">
             <div class="navbar-header">
@@ -108,7 +108,7 @@ $count = count($data);
                     if($right <= ceil($row_count / $maxlog_per_page))
                         echo("<a class=\"btn btn-default\" href=\"?page={$right}\">▶</a>");
                 ?>
-                </div><br />
+                </div><br>
                 <div class="panel panel-default">
                     <div class="panel-heading">Chat</div>
                     <div class="panel-body">
@@ -119,123 +119,7 @@ $count = count($data);
 
                     foreach ($data as $msg_info)
                     {
-                        # Team colors (bootstrap css class text-*)
-                        $ingame = true;
-                        switch((int)$msg_info['team'])
-                        {
-                            case 1:
-                                $textcolor = "muted";
-                                break;
-                            case 2:
-                                $textcolor = "danger";
-                                break;
-                            case 3:
-                                $textcolor = "primary";
-                                break;
-                            default:
-                                $textcolor = "muted";
-                                $ingame = false;
-                                break;
-                        }
-
-                        # Team chat - true/false
-                        $say_team = (bool)($msg_info['type'] == "say_team");
-                     
-                        # time that message wrote
-                        echo("<strong class='class_chatlog' id='{$msg_info["msg_id"]}'><span class=\"text-info\">[" . date("Y-m-d H:i:s", $msg_info['timestamp']) . "]</span> ");
-                        
-                        # in spectator/in team - true/false
-                        $ingame = (bool)($msg_info['team'] == 0);
-                        
-                        # Player is alive / dead
-                        if ($msg_info['team'] > 1 && !$msg_info['alive']) echo("<span style=\"color: #ffb000;\">*DEAD*</span> ");
-                        
-                        # Prefixes depending on the type of message (basechat)
-                        if(isset($msg_info["type"]))
-                        {
-                            switch ($msg_info['type'])
-                            {
-                                case "sm_hsay":
-                                    $msg_type = "[HSAY]";
-                                    break;
-    
-                                case "sm_msay":
-                                    $msg_type = "[MSAY]";
-                                    break;
-    
-                                case "sm_psay":
-                                    $msg_type = "[PRIVATE]";
-                                    break;
-    
-                                case "sm_tsay":
-                                    $msg_type = "[TSAY]";
-                                    break;
-    
-                                case "sm_say":
-                                    $msg_type = "(ALL)";
-                                    break;
-    
-                                case "sm_csay":
-                                    $msg_type = "[CSAY]";
-                                    break;
-                            }
-                            if(isset($msg_type))
-                            {
-                                echo("<span class=\"text-success\">{$msg_type}</span>");
-                            }
-                        }
-                        
-                        # Nickname color
-                        echo("<span class=\"text-{$textcolor}\">");
-                        
-                        # Team chat - prefix
-                        if($say_team) 
-                        {
-                            switch ($gameinfo)
-                            {
-                                case "CS":
-                                    switch((int)$msg_info['team'])
-                                    {
-                                        case 2:
-                                            $team = "(TERRORISTS)";
-                                            break;
-                                        case 3:
-                                            $team = "(COUNTER-TERRORISTS)";
-                                            break;
-                                        default:
-                                            $team = "(SPECTATOR)";
-                                            break;
-                                    }
-                                    
-                                    break;
-                                    
-                                case "TF2":
-                                    switch((int)$msg_info['team'])
-                                    {
-                                        case 2:
-                                            $team = "(RED)";
-                                            break;
-                                        case 3:
-                                            $team = "(BLUE)";
-                                            break;
-                                        default:
-                                            $team = "(SPECTATOR)";
-                                            break;
-                                    }
-                                    
-                                    break;
-                            }
-
-                            echo($team);
-                        }
-                        
-                        # Nickname of the player who wrote the message
-                        echo(" {$msg_info['name']}:</span> ");
-                        
-                        # Message text (if psay - hide)
-                        $message = ($msg_info['type'] == "sm_psay") ? "*PRIVATE MESSAGE*" : $msg_info['message'];
-                        echo("<span style=\"color: #ffb000;\">{$message}</span></strong><br>");
-
+                        echo(result_process($msg_info, $gameinfo) . '<br>');
                     }
 
                     # Closing the database connection
