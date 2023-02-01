@@ -6,184 +6,412 @@
 
 #pragma newdecls required
 
+//#define _DEBUG
+
+#if defined _DEBUG
+#define LOGMSG(%1) LogMessage(%1)
+#else
+#define LOGMSG(%1);
+#endif
+
+static const char g_sCreateTable[] = \
+"CREATE TABLE IF NOT EXISTS `%s` (\
+	`msg_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, \
+	`server_id` INT UNSIGNED NOT NULL, \
+	`auth` VARCHAR(65) NOT NULL, \
+	`ip` VARCHAR(65) NOT NULL, \
+	`name` VARCHAR(65) NOT NULL, \
+	`team` TINYINT NOT NULL, \
+	`alive` TINYINT NOT NULL, \
+	`timestamp` INT UNSIGNED NOT NULL, \
+	`message` VARCHAR(255) NOT NULL, \
+	`type` VARCHAR(16) NOT NULL\
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
+
+static const char g_sQuery[] = \
+"INSERT INTO `%s` (`server_id`, `auth`, `ip`, `name`, `team`, `alive`, `timestamp`, `type`, `message`) \
+	VALUES (%d, '%s', '%s', '%s', %d, %d, %d, '%s', '%s');";
+
 Database g_hDatabase;
-bool g_bIsLog[10];
+
 ConVar g_hServerID;
 ConVar g_hTable;
 
-static const char g_sSay[][] = {"say", "say_team", "sm_say", "sm_chat", "sm_csay", "sm_tsay", "sm_msay", "sm_hsay", "sm_psay"};
+int g_iServerID = 1;
 char g_sTable[256] = "chatlog";
+
+ConVar g_hLogSay;
+ConVar g_hLogSayTeam;
+ConVar g_hLogSMSay;
+ConVar g_hLogSMChat;
+ConVar g_hLogCSay;
+ConVar g_hLogTSay;
+ConVar g_hLogMSay;
+ConVar g_hLogHSay;
+ConVar g_hLogPSay;
+ConVar g_hLogTriggers;
+
+bool g_bLogSay = true;
+bool g_bLogSayTeam = true;
+bool g_bLogSMSay = true;
+bool g_bLogSMChat = true;
+bool g_bLogCSay = true;
+bool g_bLogTSay = true;
+bool g_bLogMSay = true;
+bool g_bLogHSay = true;
+bool g_bLogPSay = true;
+bool g_bLogTriggers = false;
+
 
 public Plugin myinfo = 
 {
 	name = "Chat Logging",
-	author = "R1KO",
-	version = "2.3+1"
+	author = "R1KO, Monera",
+	version = "3.0"
 }
 
 public void OnPluginStart()
 {
-	g_hServerID = CreateConVar("sm_chat_log_server_id", "1", "server ID");
-	
-	g_hTable = CreateConVar("sm_chat_log_table", "chatlog", "db Table");
+	// Create ConVars
+	g_hServerID = CreateConVar("sm_chat_log_server_id", "1", "Chat Log Plugin server identifier");
+	g_hTable = CreateConVar("sm_chat_log_table", "chatlog", "Chat Log Plugin database table");
+	g_hLogTriggers = CreateConVar("sm_chat_log_triggers", "0", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
+
+	g_hLogSay = CreateConVar("sm_chat_log_say", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
+	g_hLogSayTeam = CreateConVar("sm_chat_log_say_team", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
+	g_hLogSMSay = CreateConVar("sm_chat_log_sm_say", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
+	g_hLogSMChat = CreateConVar("sm_chat_log_sm_chat", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
+	g_hLogCSay = CreateConVar("sm_chat_log_sm_csay", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
+	g_hLogTSay = CreateConVar("sm_chat_log_sm_tsay", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
+	g_hLogMSay = CreateConVar("sm_chat_log_sm_msay", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
+	g_hLogHSay = CreateConVar("sm_chat_log_sm_hsay", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
+	g_hLogPSay = CreateConVar("sm_chat_log_sm_psay", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
+
+
+	// Add ConVar change hooks
+	g_hServerID.AddChangeHook(OnChatLogServerIDChange);
 	g_hTable.AddChangeHook(OnChatLogTableChange);
-	
-	g_hTable.GetString(g_sTable, sizeof(g_sTable));
+	g_hLogTriggers.AddChangeHook(OnLogTriggersChanged);
 
-	ConVar hCvar;
+	g_hLogSay.AddChangeHook(OnLogSayChanged);
+	g_hLogSayTeam.AddChangeHook(OnLogSayTeamChanged);
+	g_hLogSMSay.AddChangeHook(OnLogSMSayChanged);
+	g_hLogSMChat.AddChangeHook(OnLogSMChatChanged);
+	g_hLogCSay.AddChangeHook(OnLogCSayChanged);
+	g_hLogTSay.AddChangeHook(OnLogTSayChanged);
+	g_hLogMSay.AddChangeHook(OnLogMSayChanged);
+	g_hLogHSay.AddChangeHook(OnLogHSayChanged);
+	g_hLogPSay.AddChangeHook(OnLogPSayChanged);
 
-	RegConVar(hCvar, "sm_chat_log_triggers", "0", "Whether this logs chat triggers", OnLogTriggersChange, 9);
-	RegConVar(hCvar, "sm_chat_log_say", "1", "Whether this logs normal chat", OnLogSayChange, 0);
-	RegConVar(hCvar, "sm_chat_log_say_team", "1", "Whether this logs team chat", OnLogSayTeamChange, 1);
-	RegConVar(hCvar, "sm_chat_log_sm_say", "1", "Whether this logs sm_say", OnLogSmSayChange, 2);
-	RegConVar(hCvar, "sm_chat_log_chat", "1", "Whether this logs sm_chat", OnLogChatChange, 3);
-	RegConVar(hCvar, "sm_chat_log_csay", "1", "Whether this logs sm_csay", OnLogCSayChange, 4);
-	RegConVar(hCvar, "sm_chat_log_tsay", "1", "Whether this logs sm_tsay", OnLogTSayChange, 5);
-	RegConVar(hCvar, "sm_chat_log_msay", "1", "Whether this logs sm_msay", OnLogMSayChange, 6);
-	RegConVar(hCvar, "sm_chat_log_hsay", "1", "Whether this logs sm_hsay", OnLogHSayChange, 7);
-	RegConVar(hCvar, "sm_chat_log_psay", "1", "Whether this logs sm_psay", OnLogPSayChange, 8);
-	
 	AutoExecConfig(true, "chat_logging");
 
-	for(int i = 0; i < sizeof(g_sSay); ++i)
-	{
-		AddCommandListener(Say_Callback, g_sSay[i]);
-	}
+	// Register command listener
+	if(g_hLogSay.BoolValue)
+		AddCommandListener(Say_Callback, "say");
+	if(g_hLogSayTeam.BoolValue)
+		AddCommandListener(Say_Callback, "say_team");
+	if(g_hLogSMSay.BoolValue)
+		AddCommandListener(Say_Callback, "sm_say");
+	if(g_hLogSMChat.BoolValue)
+		AddCommandListener(Say_Callback, "sm_chat");
+	if(g_hLogCSay.BoolValue)
+		AddCommandListener(Say_Callback, "sm_csay");
+	if(g_hLogTSay.BoolValue)
+		AddCommandListener(Say_Callback, "sm_tsay");
+	if(g_hLogMSay.BoolValue)
+		AddCommandListener(Say_Callback, "sm_msay");
+	if(g_hLogHSay.BoolValue)
+		AddCommandListener(Say_Callback, "sm_hsay");
+	if(g_hLogPSay.BoolValue)
+		AddCommandListener(Say_Callback, "sm_psay");
 
+	// update variable
+	g_hTable.GetString(g_sTable, sizeof(g_sTable));
+}
+
+public void OnMapStart()
+{
 	if(!SQL_CheckConfig("chatlog"))
 	{
-		SetFailState("[CHAT LOG] Database failure: Could not find Database conf \"chatlog\"");
+		SetFailState("[CHAT LOG] Database failure: Could not find Database conf 'chatlog'");
 		return;
 	}
 	Database.Connect(SQL_OnConnect, "chatlog");
 }
-
-public void OnChatLogTableChange(ConVar hCvar, const char[] oldValue, const char[] newValue)
+public void OnMapEnd()
 {
-	hCvar.GetString(g_sTable, sizeof(g_sTable));
+	delete g_hDatabase;
 }
 
-void RegConVar(ConVar &hCvar, const char[] sCvar, const char[] sDefValue, const char[] sDesc, ConVarChanged callback, int index)
+public void OnChatLogServerIDChange(ConVar convar, const char[] oldValue, const char[] newValue)
 {
-	hCvar = CreateConVar(sCvar, sDefValue, sDesc, _, true, 0.0, true, 1.0);
-	hCvar.AddChangeHook(callback);
-	g_bIsLog[index] = hCvar.BoolValue;
+	LOGMSG("[CHAT LOG] g_iServerID = %d", convar.IntValue);
+	g_iServerID = convar.IntValue;
+}
+public void OnChatLogTableChange(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	LOGMSG("[CHAT LOG] g_sTable = %s", newValue);
+	convar.GetString(g_sTable, sizeof(g_sTable));
+}
+public void OnLogTriggersChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	LOGMSG("[CHAT LOG] g_bLogTriggers = %d", convar.BoolValue);
+	g_bLogTriggers = convar.BoolValue;
 }
 
-public void OnLogTriggersChange(ConVar hCvar, const char[] oldValue, const char[] newValue) { g_bIsLog[9] = GetConVarBool(hCvar); }
-public void OnLogSayChange(ConVar hCvar, const char[] oldValue, const char[] newValue) { g_bIsLog[0] = GetConVarBool(hCvar); }
-public void OnLogSayTeamChange(ConVar hCvar, const char[] oldValue, const char[] newValue) { g_bIsLog[1] = GetConVarBool(hCvar); }
-public void OnLogSmSayChange(ConVar hCvar, const char[] oldValue, const char[] newValue) { g_bIsLog[2] = GetConVarBool(hCvar); }
-public void OnLogChatChange(ConVar hCvar, const char[] oldValue, const char[] newValue) { g_bIsLog[3] = GetConVarBool(hCvar); }
-public void OnLogCSayChange(ConVar hCvar, const char[] oldValue, const char[] newValue) { g_bIsLog[4] = GetConVarBool(hCvar); }
-public void OnLogTSayChange(ConVar hCvar, const char[] oldValue, const char[] newValue) { g_bIsLog[5] = GetConVarBool(hCvar); }
-public void OnLogMSayChange(ConVar hCvar, const char[] oldValue, const char[] newValue) { g_bIsLog[6] = GetConVarBool(hCvar); }
-public void OnLogHSayChange(ConVar hCvar, const char[] oldValue, const char[] newValue) { g_bIsLog[7] = GetConVarBool(hCvar); }
-public void OnLogPSayChange(ConVar hCvar, const char[] oldValue, const char[] newValue) { g_bIsLog[8] = GetConVarBool(hCvar); }
+public void OnLogSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	if(g_bLogSay && !convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] removed command listener for say");
+		RemoveCommandListener(Say_Callback, "say");
+	}
+	else if(!g_bLogSay && convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] added command listener for say");
+		AddCommandListener(Say_Callback, "say");
+	}
+	g_bLogSay = convar.BoolValue;
+}
+public void OnLogSayTeamChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	if(g_bLogSayTeam && !convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] removed command listener for say_team");
+		RemoveCommandListener(Say_Callback, "say_team");
+	}
+	else if(!g_bLogSayTeam && convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] added command listener for say_team");
+		AddCommandListener(Say_Callback, "say_team");
+	}
+	g_bLogSayTeam = convar.BoolValue;
+}
 
-public Action Say_Callback(int iClient, const char[] sCommand, int args)
+public void OnLogSMSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	if(g_bLogSMSay && !convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] removed command listener for sm_say");
+		RemoveCommandListener(SMSay_Callback, "sm_say");
+	}
+	else if(!g_bLogSMSay && convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] added command listener for sm_say");
+		AddCommandListener(SMSay_Callback, "sm_say");
+	}
+	g_bLogSMSay = convar.BoolValue;
+}
+public void OnLogSMChatChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	if(g_bLogSMChat && !convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] removed command listener for sm_chat");
+		RemoveCommandListener(SMSay_Callback, "sm_chat");
+	}
+	else if(!g_bLogSMChat && convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] added command listener for sm_chat");
+		AddCommandListener(SMSay_Callback, "sm_chat");
+	}
+	g_bLogSMChat = convar.BoolValue;
+}
+public void OnLogCSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	if(g_bLogCSay && !convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] removed command listener for sm_csay");
+		RemoveCommandListener(SMSay_Callback, "sm_csay");
+	}
+	else if(!g_bLogCSay && convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] added command listener for sm_csay");
+		AddCommandListener(SMSay_Callback, "sm_csay");
+	}
+	g_bLogCSay = convar.BoolValue;
+}
+public void OnLogTSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	if(g_bLogTSay && !convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] removed command listener for sm_tsay");
+		RemoveCommandListener(SMSay_Callback, "sm_tsay");
+	}
+	else if(!g_bLogTSay && convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] added command listener for sm_tsay");
+		AddCommandListener(SMSay_Callback, "sm_tsay");
+	}
+	g_bLogTSay = convar.BoolValue;
+}
+public void OnLogMSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	if(g_bLogMSay && !convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] removed command listener for sm_msay");
+		RemoveCommandListener(SMSay_Callback, "sm_msay");
+	}
+	else if(!g_bLogMSay && convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] added command listener for sm_msay");
+		AddCommandListener(SMSay_Callback, "sm_msay");
+	}
+	g_bLogMSay = convar.BoolValue;
+}
+public void OnLogHSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	if(g_bLogHSay && !convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] removed command listener for sm_hsay");
+		RemoveCommandListener(SMSay_Callback, "sm_hsay");
+	}
+	else if(!g_bLogHSay && convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] added command listener for sm_hsay");
+		AddCommandListener(SMSay_Callback, "sm_hsay");
+	}
+	g_bLogHSay = convar.BoolValue;
+}
+public void OnLogPSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+{
+	if(g_bLogPSay && !convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] removed command listener for sm_psay");
+		RemoveCommandListener(SMSay_Callback, "sm_psay");
+	}
+	else if(!g_bLogPSay && convar.BoolValue)
+	{
+		LOGMSG("[CHAT LOG] added command listener for sm_psay");
+		AddCommandListener(SMSay_Callback, "sm_psay");
+	}
+	g_bLogPSay = convar.BoolValue;
+}
+
+
+public Action Say_Callback(int client, const char[] command, int argc)
 {
 	if(!g_hDatabase)
 	{
+		LOGMSG("[CHAT LOG] db handle is null");
+		return Plugin_Continue;
+	}
+	if(client <= 0 || !IsClientInGame(client))
+	{
+		LOGMSG("[CHAT LOG] not valid client");
 		return Plugin_Continue;
 	}
 
-	if(iClient > 0 && IsClientInGame(iClient))
+	if(!g_bLogTriggers && IsChatTrigger())
 	{
-		char sText[192];
-		GetCmdArgString(sText, sizeof(sText));
-		if((IsChatTrigger() && g_bIsLog[9]) || !IsChatTrigger())
-		{
-			for(int i = 0; i < sizeof(g_sSay); ++i)
-			{
-				if(strcmp(sCommand, g_sSay[i]) == 0 && g_bIsLog[i])
-				{
-					if(i < 2 && BaseComm_IsClientGagged(iClient))
-					{
-						return Plugin_Handled;
-					}
-
-					DBStatement hStmt;
-					
-					char sError[256], sName[MAX_NAME_LENGTH], sAuth[32], sIP[16], sQuery[256];
-
-					GetClientAuthId(iClient, AuthId_Steam2, sAuth, sizeof(sAuth));
-					
-					int iServerID = g_hServerID.IntValue;
-
-					GetClientName(iClient, sName, sizeof(sName));
-					GetClientIP(iClient, sIP, sizeof(sIP));
-
-					TrimString(sText);
-					StripQuotes(sText);
-
-					FormatEx(sQuery, sizeof(sQuery), "INSERT INTO `%s` (`server_id`, `auth`, `ip`, `name`, `team`, `alive`, `timestamp`, `type`, `message`) VALUES (%i, '%s', '%s', ?, %i, %b, %i, '%s', ?);", g_sTable, iServerID, sAuth, sIP, GetClientTeam(iClient), IsPlayerAlive(iClient), GetTime(), sCommand);
-
-					hStmt = SQL_PrepareQuery(g_hDatabase, sQuery, sError, sizeof(sError));
-					if (hStmt != null)
-					{
-						hStmt.BindString(0, sName, false);	
-						hStmt.BindString(1, sText, false);
-
-						if (!SQL_Execute(hStmt))
-						{
-							SQL_GetError(hStmt, sError, sizeof(sError));
-							LogError("[CHAT LOG] Fail SQL_Execute: %s", sError);
-						}
-					}
-					else
-					{
-						LogError("[CHAT LOG] Fail SQL_PrepareQuery: %s", sError);
-					}
-
-					delete hStmt;
-					
-					return Plugin_Continue;
-				}
-			}
-		}
+		LOGMSG("[CHAT LOG] chat trigger is disabled");
+		return Plugin_Continue;
 	}
-	
+	if(BaseComm_IsClientGagged(client))
+	{
+		LOGMSG("[CHAT LOG] gagged client");
+		return Plugin_Continue;
+	}
+
+	char query[1024];
+
+	char msg[256];
+	char name[MAX_NAME_LENGTH];
+	char auth[32];
+	char ip[16];
+
+	GetCmdArgString(msg, sizeof(msg));
+	GetClientName(client, name, sizeof(name));
+	GetClientAuthId(client, AuthId_Steam2, auth, sizeof(auth));
+	GetClientIP(client, ip, sizeof(ip));
+
+	int team = GetClientTeam(client);
+	bool isAlive = IsPlayerAlive(client);
+	int timestamp = GetTime();
+
+	TrimString(msg);
+	StripQuotes(msg);
+
+	SQL_FormatQuery(g_hDatabase, query, sizeof(query), g_sQuery, g_sTable, g_iServerID, auth, ip, name, team, isAlive, timestamp, command, msg);
+
+	LOGMSG("[CHAT LOG] query: %s", query);
+
+	g_hDatabase.Query(SQL_OnQuery, query, 0, DBPrio_Low);
+
 	return Plugin_Continue;
 }
 
-public void SQL_CheckError(Database hDB, DBResultSet hResults, const char[] sError, any data)
+public Action SMSay_Callback(int client, const char[] command, int argc)
 {
-	if(sError[0]) LogError("[CHAT LOG] Query Failed: %s", sError);
+	if(!g_hDatabase)
+	{
+		LOGMSG("[CHAT LOG] db handle is null");
+		return Plugin_Continue;
+	}
+	if(client <= 0 || !IsClientInGame(client))
+	{
+		LOGMSG("[CHAT LOG] not valid client");
+		return Plugin_Continue;
+	}
+
+	char query[1024];
+
+	char msg[256];
+	char name[MAX_NAME_LENGTH];
+	char auth[32];
+	char ip[16];
+
+	GetCmdArgString(msg, sizeof(msg));
+	GetClientName(client, name, sizeof(name));
+	GetClientAuthId(client, AuthId_Steam2, auth, sizeof(auth));
+	GetClientIP(client, ip, sizeof(ip));
+
+	int team = GetClientTeam(client);
+	bool isAlive = IsPlayerAlive(client);
+	int timestamp = GetTime();
+
+	TrimString(msg);
+	StripQuotes(msg);
+
+	SQL_FormatQuery(g_hDatabase, query, sizeof(query), g_sQuery, g_sTable, g_iServerID, auth, ip, name, team, isAlive, timestamp, command, msg);
+
+	LOGMSG("[CHAT LOG] query: %s", query);
+
+	g_hDatabase.Query(SQL_OnQuery, query, 0, DBPrio_Low);
+
+	return Plugin_Continue;
 }
 
-public void SQL_OnConnect(Database hDatabase, const char[] sError, any data)
+public void SQL_OnQuery(Database db, DBResultSet results, const char[] error, any data)
 {
-	if (hDatabase == null)
+	if(db == null || results == null || error[0] != '\0')
 	{
-		SetFailState("[CHAT LOG] Failed to connect to database (%s)", sError);
+		LogError("[CHAT LOG] Query Failed: %s", error);
 		return;
 	}
-	else
+}
+
+public void SQL_OnConnect(Database db, const char[] error, any data)
+{
+	if(db == null)
 	{
-		g_hDatabase = hDatabase;
-
-		SQL_LockDatabase(g_hDatabase);
-		char sQuery[1024];
-
-		FormatEx(sQuery, sizeof(sQuery), "CREATE TABLE IF NOT EXISTS `%s` (\
-												`msg_id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, \
-												`server_id` INT UNSIGNED NOT NULL, \
-												`auth` VARCHAR(65) NOT NULL, \
-												`ip` VARCHAR(65) NOT NULL, \
-												`name` VARCHAR(65) NOT NULL, \
-												`team` TINYINT NOT NULL, \
-												`alive` TINYINT NOT NULL, \
-												`timestamp` INT UNSIGNED NOT NULL, \
-												`message` VARCHAR(255) NOT NULL, \
-												`type` VARCHAR(16) NOT NULL\
-												) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", g_sTable);
-		g_hDatabase.Query(SQL_CheckError, sQuery);
-		SQL_UnlockDatabase(g_hDatabase);
-
-		SQL_FastQuery(g_hDatabase, "SET NAMES 'utf8mb4'");
-		SQL_FastQuery(g_hDatabase, "SET CHARSET 'utf8mb4'");
-
-		g_hDatabase.SetCharset("utf8mb4");
+		SetFailState("[CHAT LOG] Failed to connect to database: %s", error);
+		return;
 	}
+
+	char query[1024];
+	FormatEx(query, sizeof(query), g_sCreateTable, g_sTable);
+	LOGMSG("[CHAT LOG] query: %s", query);
+	if(!SQL_FastQuery(db, query))
+	{
+		char err[256];
+		SQL_GetError(db, err, sizeof(err));
+		LogError("[CHAT LOG] Query Failed: %s", err);
+	}	
+
+	SQL_FastQuery(db, "SET NAMES 'utf8mb4'");
+	SQL_FastQuery(db, "SET CHARSET 'utf8mb4'");
+
+	db.SetCharset("utf8mb4");
+
+	g_hDatabase = db;
 }
