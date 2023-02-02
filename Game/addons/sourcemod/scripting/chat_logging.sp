@@ -75,17 +75,17 @@ public void OnPluginStart()
 	// Create ConVars
 	g_hServerID = CreateConVar("sm_chat_log_server_id", "1", "Chat Log Plugin server identifier");
 	g_hTable = CreateConVar("sm_chat_log_table", "chatlog", "Chat Log Plugin database table");
-	g_hLogTriggers = CreateConVar("sm_chat_log_triggers", "0", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
+	g_hLogTriggers = CreateConVar("sm_chat_log_triggers", "0", "Whether chat log plugin logs chat triggers", _, true, 0.0, true, 1.0);
 
 	g_hLogSay = CreateConVar("sm_chat_log_say", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
-	g_hLogSayTeam = CreateConVar("sm_chat_log_say_team", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
-	g_hLogSMSay = CreateConVar("sm_chat_log_sm_say", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
-	g_hLogSMChat = CreateConVar("sm_chat_log_sm_chat", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
-	g_hLogCSay = CreateConVar("sm_chat_log_sm_csay", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
-	g_hLogTSay = CreateConVar("sm_chat_log_sm_tsay", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
-	g_hLogMSay = CreateConVar("sm_chat_log_sm_msay", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
-	g_hLogHSay = CreateConVar("sm_chat_log_sm_hsay", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
-	g_hLogPSay = CreateConVar("sm_chat_log_sm_psay", "1", "Whether chat log plugin logs normal chat", _, true, 0.0, true, 1.0);
+	g_hLogSayTeam = CreateConVar("sm_chat_log_say_team", "1", "Whether chat log plugin logs team chat", _, true, 0.0, true, 1.0);
+	g_hLogSMSay = CreateConVar("sm_chat_log_sm_say", "1", "Whether chat log plugin logs sm_say", _, true, 0.0, true, 1.0);
+	g_hLogSMChat = CreateConVar("sm_chat_log_sm_chat", "1", "Whether chat log plugin logs sm_chat", _, true, 0.0, true, 1.0);
+	g_hLogCSay = CreateConVar("sm_chat_log_sm_csay", "1", "Whether chat log plugin logs sm_csay", _, true, 0.0, true, 1.0);
+	g_hLogTSay = CreateConVar("sm_chat_log_sm_tsay", "1", "Whether chat log plugin logs sm_tsay", _, true, 0.0, true, 1.0);
+	g_hLogMSay = CreateConVar("sm_chat_log_sm_msay", "1", "Whether chat log plugin logs sm_msay", _, true, 0.0, true, 1.0);
+	g_hLogHSay = CreateConVar("sm_chat_log_sm_hsay", "1", "Whether chat log plugin logs sm_hsay", _, true, 0.0, true, 1.0);
+	g_hLogPSay = CreateConVar("sm_chat_log_sm_psay", "1", "Whether chat log plugin logs sm_psay", _, true, 0.0, true, 1.0);
 
 
 	// Add ConVar change hooks
