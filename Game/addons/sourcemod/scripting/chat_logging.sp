@@ -67,7 +67,7 @@ public Plugin myinfo =
 {
 	name = "Chat Logging",
 	author = "R1KO, Monera",
-	version = "3.0"
+	version = "3.0.1"
 }
 
 public void OnPluginStart()
@@ -103,37 +103,51 @@ public void OnPluginStart()
 	g_hLogHSay.AddChangeHook(OnLogHSayChanged);
 	g_hLogPSay.AddChangeHook(OnLogPSayChanged);
 
+
 	AutoExecConfig(true, "chat_logging");
 
-	// Register command listener
-	if(g_hLogSay.BoolValue)
-		AddCommandListener(Say_Callback, "say");
-	if(g_hLogSayTeam.BoolValue)
-		AddCommandListener(Say_Callback, "say_team");
-	if(g_hLogSMSay.BoolValue)
-		AddCommandListener(Say_Callback, "sm_say");
-	if(g_hLogSMChat.BoolValue)
-		AddCommandListener(Say_Callback, "sm_chat");
-	if(g_hLogCSay.BoolValue)
-		AddCommandListener(Say_Callback, "sm_csay");
-	if(g_hLogTSay.BoolValue)
-		AddCommandListener(Say_Callback, "sm_tsay");
-	if(g_hLogMSay.BoolValue)
-		AddCommandListener(Say_Callback, "sm_msay");
-	if(g_hLogHSay.BoolValue)
-		AddCommandListener(Say_Callback, "sm_hsay");
-	if(g_hLogPSay.BoolValue)
-		AddCommandListener(Say_Callback, "sm_psay");
 
 	// update variable
+	g_iServerID = g_hServerID.IntValue;
 	g_hTable.GetString(g_sTable, sizeof(g_sTable));
+	g_bLogTriggers = g_hLogTriggers.BoolValue;
+
+	g_bLogSay = g_hLogSay.BoolValue;
+	g_bLogSayTeam = g_hLogSayTeam.BoolValue;
+	g_bLogSMSay = g_hLogSMSay.BoolValue;
+	g_bLogSMChat = g_hLogSMChat.BoolValue;
+	g_bLogCSay = g_hLogCSay.BoolValue;
+	g_bLogTSay = g_hLogTSay.BoolValue;
+	g_bLogMSay = g_hLogMSay.BoolValue;
+	g_bLogHSay = g_hLogHSay.BoolValue;
+	g_bLogPSay = g_hLogPSay.BoolValue;
+
+	// Register command listener
+	if(g_bLogSay)
+		AddCommandListener(Say_Callback, "say");
+	if(g_bLogSayTeam)
+		AddCommandListener(Say_Callback, "say_team");
+	if(g_bLogSMSay)
+		AddCommandListener(Say_Callback, "sm_say");
+	if(g_bLogSMChat)
+		AddCommandListener(Say_Callback, "sm_chat");
+	if(g_bLogCSay)
+		AddCommandListener(Say_Callback, "sm_csay");
+	if(g_bLogTSay)
+		AddCommandListener(Say_Callback, "sm_tsay");
+	if(g_bLogMSay)
+		AddCommandListener(Say_Callback, "sm_msay");
+	if(g_bLogHSay)
+		AddCommandListener(Say_Callback, "sm_hsay");
+	if(g_bLogPSay)
+		AddCommandListener(Say_Callback, "sm_psay");
 }
 
 public void OnMapStart()
 {
 	if(!SQL_CheckConfig("chatlog"))
 	{
-		SetFailState("[CHAT LOG] Database failure: Could not find Database conf 'chatlog'");
+		LogError("[CHAT LOG] Database failure: Could not find Database conf 'chatlog'");
 		return;
 	}
 	Database.Connect(SQL_OnConnect, "chatlog");
