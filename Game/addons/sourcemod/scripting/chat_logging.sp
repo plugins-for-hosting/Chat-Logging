@@ -157,23 +157,23 @@ public void OnMapEnd()
 	delete g_hDatabase;
 }
 
-public void OnChatLogServerIDChange(ConVar convar, const char[] oldValue, const char[] newValue)
+void OnChatLogServerIDChange(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	LOGMSG("[CHAT LOG] g_iServerID = %d", convar.IntValue);
 	g_iServerID = convar.IntValue;
 }
-public void OnChatLogTableChange(ConVar convar, const char[] oldValue, const char[] newValue)
+void OnChatLogTableChange(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	LOGMSG("[CHAT LOG] g_sTable = %s", newValue);
 	convar.GetString(g_sTable, sizeof(g_sTable));
 }
-public void OnLogTriggersChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+void OnLogTriggersChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	LOGMSG("[CHAT LOG] g_bLogTriggers = %d", convar.BoolValue);
 	g_bLogTriggers = convar.BoolValue;
 }
 
-public void OnLogSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+void OnLogSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	if(g_bLogSay && !convar.BoolValue)
 	{
@@ -187,7 +187,7 @@ public void OnLogSayChanged(ConVar convar, const char[] oldValue, const char[] n
 	}
 	g_bLogSay = convar.BoolValue;
 }
-public void OnLogSayTeamChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+void OnLogSayTeamChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	if(g_bLogSayTeam && !convar.BoolValue)
 	{
@@ -202,7 +202,7 @@ public void OnLogSayTeamChanged(ConVar convar, const char[] oldValue, const char
 	g_bLogSayTeam = convar.BoolValue;
 }
 
-public void OnLogSMSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+void OnLogSMSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	if(g_bLogSMSay && !convar.BoolValue)
 	{
@@ -216,7 +216,7 @@ public void OnLogSMSayChanged(ConVar convar, const char[] oldValue, const char[]
 	}
 	g_bLogSMSay = convar.BoolValue;
 }
-public void OnLogSMChatChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+void OnLogSMChatChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	if(g_bLogSMChat && !convar.BoolValue)
 	{
@@ -230,7 +230,7 @@ public void OnLogSMChatChanged(ConVar convar, const char[] oldValue, const char[
 	}
 	g_bLogSMChat = convar.BoolValue;
 }
-public void OnLogCSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+void OnLogCSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	if(g_bLogCSay && !convar.BoolValue)
 	{
@@ -244,7 +244,7 @@ public void OnLogCSayChanged(ConVar convar, const char[] oldValue, const char[] 
 	}
 	g_bLogCSay = convar.BoolValue;
 }
-public void OnLogTSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+void OnLogTSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	if(g_bLogTSay && !convar.BoolValue)
 	{
@@ -258,7 +258,7 @@ public void OnLogTSayChanged(ConVar convar, const char[] oldValue, const char[] 
 	}
 	g_bLogTSay = convar.BoolValue;
 }
-public void OnLogMSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+void OnLogMSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	if(g_bLogMSay && !convar.BoolValue)
 	{
@@ -272,7 +272,7 @@ public void OnLogMSayChanged(ConVar convar, const char[] oldValue, const char[] 
 	}
 	g_bLogMSay = convar.BoolValue;
 }
-public void OnLogHSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+void OnLogHSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	if(g_bLogHSay && !convar.BoolValue)
 	{
@@ -286,7 +286,7 @@ public void OnLogHSayChanged(ConVar convar, const char[] oldValue, const char[] 
 	}
 	g_bLogHSay = convar.BoolValue;
 }
-public void OnLogPSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
+void OnLogPSayChanged(ConVar convar, const char[] oldValue, const char[] newValue)
 {
 	if(g_bLogPSay && !convar.BoolValue)
 	{
@@ -302,7 +302,7 @@ public void OnLogPSayChanged(ConVar convar, const char[] oldValue, const char[] 
 }
 
 
-public Action Say_Callback(int client, const char[] command, int argc)
+Action Say_Callback(int client, const char[] command, int argc)
 {
 	if(!g_hDatabase)
 	{
@@ -354,7 +354,7 @@ public Action Say_Callback(int client, const char[] command, int argc)
 	return Plugin_Continue;
 }
 
-public Action SMSay_Callback(int client, const char[] command, int argc)
+Action SMSay_Callback(int client, const char[] command, int argc)
 {
 	if(!g_hDatabase)
 	{
@@ -395,7 +395,7 @@ public Action SMSay_Callback(int client, const char[] command, int argc)
 	return Plugin_Continue;
 }
 
-public void SQL_OnQuery(Database db, DBResultSet results, const char[] error, any data)
+void SQL_OnQuery(Database db, DBResultSet results, const char[] error, any data)
 {
 	if(db == null || results == null || error[0] != '\0')
 	{
@@ -404,7 +404,7 @@ public void SQL_OnQuery(Database db, DBResultSet results, const char[] error, an
 	}
 }
 
-public void SQL_OnConnect(Database db, const char[] error, any data)
+void SQL_OnConnect(Database db, const char[] error, any data)
 {
 	if(db == null)
 	{
