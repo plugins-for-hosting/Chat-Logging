@@ -128,19 +128,19 @@ public void OnPluginStart()
 	if(g_bLogSayTeam)
 		AddCommandListener(Say_Callback, "say_team");
 	if(g_bLogSMSay)
-		AddCommandListener(Say_Callback, "sm_say");
+		AddCommandListener(SMSay_Callback, "sm_say");
 	if(g_bLogSMChat)
-		AddCommandListener(Say_Callback, "sm_chat");
+		AddCommandListener(SMSay_Callback, "sm_chat");
 	if(g_bLogCSay)
-		AddCommandListener(Say_Callback, "sm_csay");
+		AddCommandListener(SMSay_Callback, "sm_csay");
 	if(g_bLogTSay)
-		AddCommandListener(Say_Callback, "sm_tsay");
+		AddCommandListener(SMSay_Callback, "sm_tsay");
 	if(g_bLogMSay)
-		AddCommandListener(Say_Callback, "sm_msay");
+		AddCommandListener(SMSay_Callback, "sm_msay");
 	if(g_bLogHSay)
-		AddCommandListener(Say_Callback, "sm_hsay");
+		AddCommandListener(SMSay_Callback, "sm_hsay");
 	if(g_bLogPSay)
-		AddCommandListener(Say_Callback, "sm_psay");
+		AddCommandListener(SMSay_Callback, "sm_psay");
 }
 
 public void OnMapStart()
